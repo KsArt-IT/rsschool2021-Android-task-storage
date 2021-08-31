@@ -11,6 +11,7 @@ import ru.ksart.potatohandbook.model.db.PotatoDao
 import ru.ksart.potatohandbook.model.db.PotatoDatabase
 import ru.ksart.potatohandbook.model.db.PotatoDatabaseVersion
 import ru.ksart.potatohandbook.model.db.room.PotatoDatabaseRoomImpl
+import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -46,16 +47,31 @@ class DatabaseModule {
             .build()
     }
 
+/*
     @Provides
     @Singleton
     fun provideDao(
         @PotatoDatabaseRoom roomDb: PotatoDatabase,
         @PotatoDatabaseCursor cursorDb: PotatoDatabase,
-        isRoom: Boolean = true,
+//        isRoom: Boolean = true,
     ): PotatoDao {
         return if (isRoom) roomDb.potatoDao()
         else cursorDb.potatoDao()
     }
+*/
+
+/*
+    fun getDao(isRoom: Boolean = true): PotatoDao {
+        @PotatoDatabaseRoom
+        lateinit var  roomDb: PotatoDatabase
+
+        @PotatoDatabaseCursor
+        lateinit var  cursorDb: PotatoDatabase
+
+        return if (isRoom) roomDb.potatoDao()
+        else cursorDb.potatoDao()
+    }
+*/
 }
 
 @Qualifier
@@ -65,3 +81,17 @@ annotation class PotatoDatabaseRoom
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class PotatoDatabaseCursor
+
+/*
+class MyDao @Inject constructor(
+    @PotatoDatabaseRoom private val roomDb: PotatoDatabase,
+    @PotatoDatabaseCursor private val cursorDb: PotatoDatabase,
+) {
+
+    fun getDao(isRoom: Boolean = true): PotatoDao {
+        return if (isRoom) roomDb.potatoDao()
+        else cursorDb.potatoDao()
+    }
+
+}
+*/

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    button-->
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="button_margin">16dp</dimen>
+
+    <dimen name="item_padding">8dp</dimen>
+    <dimen name="item_margin">8dp</dimen>
+    <dimen name="item_margin_large">16dp</dimen>
+
+    <dimen name="item_add_padding">16dp</dimen>
+    <dimen name="item_add_margin">8dp</dimen>
+</resources>
