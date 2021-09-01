@@ -9,5 +9,14 @@
         android:id="@+id/potatoFragment"
         android:name="ru.ksart.potatohandbook.ui.potato.PotatoFragment"
         android:label="PotatoFragment"
-        tools:layout="@layout/fragment_potato"/>
+        tools:layout="@layout/fragment_potato">
+        <action
+            android:id="@+id/action_potatoFragment_to_potatoAddFragment"
+            app:destination="@id/potatoAddFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/potatoAddFragment"
+        android:name="ru.ksart.potatohandbook.ui.potato.add.PotatoAddFragment"
+        android:label="PotatoAddFragment"
+        tools:layout="@layout/fragment_potato_add"/>
 </navigation>

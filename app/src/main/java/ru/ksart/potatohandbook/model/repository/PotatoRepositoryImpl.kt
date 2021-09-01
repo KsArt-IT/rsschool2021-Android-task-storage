@@ -41,4 +41,9 @@ class PotatoRepositoryImpl @Inject constructor(
     override suspend fun delete(item: Potato) {
         getDao().removePotato(item)
     }
+
+    override suspend fun downloadImage(url: String) : String {
+
+        return ""
+    }
 }
