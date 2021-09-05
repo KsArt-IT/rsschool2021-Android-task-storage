@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.ksart.potatohandbook.model.data.PeriodRipening
+import ru.ksart.potatohandbook.model.data.PotatoVariety
+import ru.ksart.potatohandbook.model.data.Productivity
 import ru.ksart.potatohandbook.model.db.Potato
 import ru.ksart.potatohandbook.model.repository.PotatoRepository
 import ru.ksart.potatohandbook.utils.DebugHelper
@@ -53,19 +56,26 @@ class PotatoAddViewModel @Inject constructor(
         name: String,
         description: String,
         imageUrl: String,
+        variety: String,
+        ripening: String,
+        productivity: String,
     ) {
         viewModelScope.launch {
             try {
                 checkNameField(name)
                 checkDescriptionField(description)
                 if (_isDescriptionFieldError.value || _isNameFieldError.value) return@launch
-                val imageUri = if (imageUrl.isNotBlank()) repository.downloadImage(imageUrl) else null
+                val imageUri = if (imageUrl.isNotBlank()) repository.downloadImage(name, imageUrl) else null
                 repository.add(
                     item = Potato(
                         id = 0,
                         name = name,
                         description = description,
-                        imageUri = imageUri
+                        imageUri = imageUri,
+                        imageUrl = if (imageUrl.isNotBlank()) imageUrl else null,
+                        variety = PotatoVariety.values()[variety.toIntOrNull() ?: 0],
+                        ripening = PeriodRipening.values()[ripening.toIntOrNull() ?: 0],
+                        productivity = Productivity.values()[productivity.toIntOrNull() ?: 0],
                     )
                 )
                 _isItemAdded.value = true

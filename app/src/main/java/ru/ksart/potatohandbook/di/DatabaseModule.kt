@@ -7,10 +7,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import ru.ksart.potatohandbook.model.db.DbMs
 import ru.ksart.potatohandbook.model.db.PotatoDao
 import ru.ksart.potatohandbook.model.db.PotatoDatabase
 import ru.ksart.potatohandbook.model.db.PotatoDatabaseVersion
 import ru.ksart.potatohandbook.model.db.room.PotatoDatabaseRoomImpl
+import ru.ksart.potatohandbook.utils.DebugHelper
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -36,7 +38,7 @@ class DatabaseModule {
     @PotatoDatabaseCursor
     @Provides
     @Singleton
-    fun provideDatabaseCursor(@ApplicationContext context: Context) : PotatoDatabase {
+    fun provideDatabaseCursor(@ApplicationContext context: Context): PotatoDatabase {
         return Room.databaseBuilder(
             context,
             PotatoDatabaseRoomImpl::class.java,
@@ -48,17 +50,32 @@ class DatabaseModule {
     }
 
 /*
+    @Singleton
+    class PotatoDatabaseDao @Inject constructor(
+        @PotatoDatabaseRoom private val roomDb: PotatoDatabase,
+        @PotatoDatabaseCursor private val cursorDb: PotatoDatabase,
+    ) {
+        fun potatoDao(isRoom: Boolean): PotatoDao {
+            return if (isRoom) roomDb.potatoDao()
+            else cursorDb.potatoDao()
+        }
+
+    }
+*/
+
     @Provides
     @Singleton
     fun provideDao(
         @PotatoDatabaseRoom roomDb: PotatoDatabase,
         @PotatoDatabaseCursor cursorDb: PotatoDatabase,
-//        isRoom: Boolean = true,
-    ): PotatoDao {
-        return if (isRoom) roomDb.potatoDao()
-        else cursorDb.potatoDao()
+    ): PotatoDao = when (PotatoDatabaseVersion.useDbMs) {
+        DbMs.Room -> roomDb.potatoDao().also {
+            DebugHelper.log("provideDao use Room")
+        }
+        DbMs.Cursor -> cursorDb.potatoDao().also {
+            DebugHelper.log("provideDao use Cursor")
+        }
     }
-*/
 
 /*
     fun getDao(isRoom: Boolean = true): PotatoDao {

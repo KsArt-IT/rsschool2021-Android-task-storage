@@ -10,5 +10,5 @@ interface PotatoRepository {
     suspend fun add(item: Potato)
     suspend fun updatePotato(item: Potato)
 
-    suspend fun downloadImage(url: String) : String
+    suspend fun downloadImage(name: String, url: String) : String
 }

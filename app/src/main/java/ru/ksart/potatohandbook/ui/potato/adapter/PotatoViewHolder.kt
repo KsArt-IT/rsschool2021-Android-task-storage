@@ -8,6 +8,7 @@ import coil.transform.CircleCropTransformation
 import ru.ksart.potatohandbook.R
 import ru.ksart.potatohandbook.databinding.ItemPotatoBinding
 import ru.ksart.potatohandbook.model.db.Potato
+import java.io.File
 
 class PotatoViewHolder(
     private val binding: ItemPotatoBinding,
@@ -29,16 +30,16 @@ class PotatoViewHolder(
         views {
             caption.text = item.name
             description.text = item.description
-            image.load(
-                // необходимо добавить пустую картинку картошки
-//            item.images.firstOrNull()?.image ?:
-                R.drawable.ic_download
-            ) {
-                crossfade(true)
-                placeholder(R.drawable.ic_download)
-                error(R.drawable.ic_error)
-                transformations(CircleCropTransformation())
-            }
+            val imageShow = if (item.imageUri != null && File(item.imageUri).exists()) item.imageUri
+            else item.imageUrl
+            imageShow?.let {
+                image.load(imageShow) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_download)
+                    error(R.drawable.ic_error)
+                    transformations(CircleCropTransformation())
+                }
+            } ?: image.load(R.drawable.potato)
         }
     }
 
