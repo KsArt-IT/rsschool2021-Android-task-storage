@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--name,variety,ripening,productivity,-->
+<!--    сортировать по названию сорта или по параметрам-->
+    <PreferenceCategory
+        android:title="@string/basic_sort_title">
+
+        <SwitchPreferenceCompat
+            android:key="name_switch"
+            android:title="@string/name_title"
+            android:summary="@string/potato_name_hint"
+            android:defaultValue="true"/>
+<!--
+        android:summaryOn="@string/summary_on_toggle_summary_preference"
+        android:summaryOff="@string/summary_off_toggle_summary_preference"/>
+-->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="advanced"
+        android:title="@string/preferences_sort_title"
+        app:initialExpandedChildrenCount="0">
+
+        <DropDownPreference
+            android:key="variety"
+            android:title="@string/potato_variety_hint"
+            android:entries="@array/variety"
+            app:useSimpleSummaryProvider="true"
+            android:entryValues="@array/variety_values"
+            android:defaultValue="0"/>
+        <DropDownPreference
+            android:key="ripening"
+            android:title="@string/potato_ripening_hint"
+            android:entries="@array/ripening"
+            app:useSimpleSummaryProvider="true"
+            android:entryValues="@array/ripening_values"
+            android:defaultValue="0"/>
+        <DropDownPreference
+            android:key="productivity"
+            android:title="@string/potato_productivity_hint"
+            android:entries="@array/productivity"
+            app:useSimpleSummaryProvider="true"
+            android:entryValues="@array/productivity_values"
+            android:defaultValue="0"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

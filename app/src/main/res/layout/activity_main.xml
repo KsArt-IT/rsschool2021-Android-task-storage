@@ -18,6 +18,8 @@
             tools:title="@string/app_name"
             android:fitsSystemWindows="true"
             android:id="@+id/toolbar"
+            app:navigationIcon="@drawable/ic_track_24"
+            app:menu="@menu/menu_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize" />
     </com.google.android.material.appbar.AppBarLayout>

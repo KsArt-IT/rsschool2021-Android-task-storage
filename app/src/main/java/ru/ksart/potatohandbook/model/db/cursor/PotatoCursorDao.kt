@@ -20,4 +20,8 @@ class PotatoCursorDao: PotatoDao {
     override suspend fun removePotato(potato: Potato) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun removePotatoAll() {
+        TODO("Not yet implemented")
+    }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -14,9 +15,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import ru.ksart.potatohandbook.R
 import ru.ksart.potatohandbook.databinding.FragmentPotatoBinding
 import ru.ksart.potatohandbook.model.db.Potato
+import ru.ksart.potatohandbook.ui.ShowMenu
 import ru.ksart.potatohandbook.ui.potato.adapter.PotatoAdapter
 import ru.ksart.potatohandbook.ui.potato.adapter.SwipeHelper
 import ru.ksart.potatohandbook.utils.DebugHelper
@@ -26,9 +29,11 @@ class PotatoFragment : Fragment() {
 
     private var binding: FragmentPotatoBinding? = null
 
-    private val viewModel by viewModels<PotatoViewModel>()
+    private val viewModel by activityViewModels<PotatoViewModel>()
 
     private val potatoAdapter: PotatoAdapter? get() = views { potatoList.adapter as? PotatoAdapter }
+
+    private val parent get() = activity?.let { it as? ShowMenu }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +44,8 @@ class PotatoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         DebugHelper.log("PotatoFragment|onViewCreated ${this.hashCode()}")
+        parent?.showMenu(show = true)
+        viewModel.readFilter()
         initAdapter()
         bindViewModel()
         initListener()
@@ -64,7 +71,8 @@ class PotatoFragment : Fragment() {
     private fun bindViewModel() {
         viewModel.run {
             lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
-            viewModel.potatoes.onEach { showList(it) }.launchIn(lifecycleScope)
+//            lifecycleScope.launch { viewModel.potatoes.collect(::showList) }
+//            viewModel.potatoes.onEach { showList(it) }.launchIn(lifecycleScope)
 //            lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
         }
     }

@@ -16,7 +16,11 @@ import ru.ksart.potatohandbook.databinding.FragmentPotatoAddBinding
 import ru.ksart.potatohandbook.model.data.PeriodRipening
 import ru.ksart.potatohandbook.model.data.PotatoVariety
 import ru.ksart.potatohandbook.model.data.Productivity
-import ru.ksart.potatohandbook.ui.extensions.*
+import ru.ksart.potatohandbook.ui.ShowMenu
+import ru.ksart.potatohandbook.ui.extensions.hideKeyboardFrom
+import ru.ksart.potatohandbook.ui.extensions.setAdapterFromList
+import ru.ksart.potatohandbook.ui.extensions.setItemByIndex
+import ru.ksart.potatohandbook.ui.extensions.toast
 import ru.ksart.potatohandbook.utils.DebugHelper
 
 @AndroidEntryPoint
@@ -24,6 +28,7 @@ class PotatoAddFragment : Fragment() {
 
     private var binding: FragmentPotatoAddBinding? = null
     private val viewModel by viewModels<PotatoAddViewModel>()
+    private val parent get() = activity?.let { it as? ShowMenu }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +38,8 @@ class PotatoAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        DebugHelper.log("PotatoAddFragment|onViewCreated ${this.hashCode()}")
+        parent?.showMenu(show = false)
         initListener()
         initAdapters()
         bindViewModel()

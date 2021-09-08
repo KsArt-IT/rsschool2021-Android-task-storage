@@ -13,10 +13,17 @@
         <action
             android:id="@+id/action_potatoFragment_to_potatoAddFragment"
             app:destination="@id/potatoAddFragment" />
+        <action
+            android:id="@+id/action_potatoFragment_to_filterFragment"
+            app:destination="@id/filterFragment" />
     </fragment>
     <fragment
         android:id="@+id/potatoAddFragment"
         android:name="ru.ksart.potatohandbook.ui.potato.add.PotatoAddFragment"
-        android:label="PotatoAddFragment"
+        android:label="@string/title_action_add_item"
         tools:layout="@layout/fragment_potato_add"/>
+    <fragment
+        android:id="@+id/filterFragment"
+        android:name="ru.ksart.potatohandbook.ui.potato.filter.FilterFragment"
+        android:label="@string/title_action_filter" />
 </navigation>

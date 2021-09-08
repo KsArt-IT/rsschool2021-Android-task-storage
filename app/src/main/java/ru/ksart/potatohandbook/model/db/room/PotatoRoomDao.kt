@@ -26,6 +26,9 @@ abstract class PotatoRoomDao: PotatoDao {
     @Delete
     abstract override suspend fun removePotato(potato: Potato)
 
+    @Query("DELETE FROM ${PotatoContract.TABLE_NAME}")
+    abstract override suspend fun removePotatoAll()
+
 //    @Query("DELETE FROM ${PotatoContract.TABLE_NAME} WHERE ${PotatoContract.Columns.ID} = :potatoId")
 //    suspend fun removePotatoById(potatoId: Long)
 }

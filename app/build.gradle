@@ -48,6 +48,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     // Fragment
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
+    // PreferenceFragmentCompat
+    implementation "androidx.preference:preference-ktx:1.1.1"
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     // Lifecycle KTX

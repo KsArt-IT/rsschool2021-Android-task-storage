@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="ripening">
+        <item>@string/na</item>
+        <item>@string/ripening_period_early_caption</item>
+        <item>@string/ripening_period_medium_early_caption</item>
+        <item>@string/ripening_period_medium_ripe_caption</item>
+        <item>@string/ripening_period_medium_late_caption</item>
+        <item>@string/ripening_period_late_caption</item>
+    </string-array>
+
+    <string-array name="ripening_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>

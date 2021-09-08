@@ -1,15 +1,21 @@
 <resources>
     <string name="app_name">Potatoes</string>
 
-    <!--    сорт картофеля-->
+    <string name="list_empty_text">The list is empty</string>
+    <string name="title_action_search">Search</string>
+    <string name="title_action_filter">Filter</string>
+    <string name="title_action_add_data">Add data</string>
+    <string name="title_action_delete">Delete all</string>
+    <string name="title_action_add_item">Adding potato variety</string>
     <string name="na">-</string>
+    <!--    содержание крахмала-->
+    <string name="starch_content_potatoes">Starch content</string>
+    <!--    сорт картофеля-->
     <string name="potato_varieties">Potato Varieties</string>
     <string name="potato_variety_table_caption">Table potatoes</string>
     <string name="potato_variety_fodder_caption">Fodder potatoes</string>
     <string name="potato_variety_technical_caption">Technical potatoes</string>
     <string name="potato_variety_universal_caption">Universal potatoes</string>
-    <!--    содержание крахмала-->
-    <string name="starch_content_potatoes">Starch content</string>
     <!--    Ранний(40-50 дней), Среднеранний(55-65 дней), Среднеспелый(65-80 дней), Среднепоздний(80-100 дней), Поздний(Свыше 100 дней)-->
     <string name="ripening_period">Ripening period</string>
     <string name="ripening_period_early_caption">Early (40–50)</string>
@@ -22,23 +28,28 @@
     <string name="yield_high_caption">High</string>
     <string name="yield_average_caption">Average</string>
     <string name="yield_low_caption">Low</string>
-    <string name="list_empty_text">The list is empty</string>
 
+    <!--    Добавление элемента -->
+    <string name="add_button_text">Add</string>
     <string name="add_new_item_description">Add new item</string>
 
-    <string name="add_button_text">Add</string>
-
-    <string name="potato_name_hint">Potato variety name</string>
-    <string name="potato_add_yield_hint">Potato yield</string>
-    <string name="potato_add_yield_weight_hint">Potato yield weight</string>
     <string name="potato_add_image_url_hint">Link to picture of potato to download</string>
     <string name="potato_image_uri_hint">Link to image of potato</string>
 
-    <string name="potato_description_hint">Potato yield weight</string>
+    <string name="name_title">Name</string>
+    <string name="potato_name_hint">Potato variety name</string>
+    <string name="potato_description_hint">Description of potato variety</string>
     <string name="potato_detail_url_hint">Link to the site with detailed information</string>
     <string name="potato_variety_hint">Potato variety</string>
     <string name="potato_ripening_hint">Potato ripening</string>
     <string name="potato_starch_hint">Starch content in potatoes</string>
     <string name="potato_productivity_hint">Potato yield</string>
+
+    <!-- сортировка -->
+    <string name="basic_sort_title">Basic sorting</string>
+    <string name="preferences_sort_title">Preferences sorting</string>
+
+    <string name="variety_preference_title">Variety</string>
+    <string name="variety_preference_summary">Potato variety and quality</string>
 
 </resources>

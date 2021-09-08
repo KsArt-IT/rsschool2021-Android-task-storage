@@ -7,4 +7,5 @@ interface PotatoDao {
     suspend fun insertPotato(potato: Potato): Long
     suspend fun updatePotato(potato: Potato)
     suspend fun removePotato(potato: Potato)
+    suspend fun removePotatoAll()
 }

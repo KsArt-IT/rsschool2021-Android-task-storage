@@ -3,14 +3,20 @@ package ru.ksart.potatohandbook.model.repository
 import android.content.Context
 import android.os.Environment
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
+import ru.ksart.potatohandbook.model.data.PeriodRipening
+import ru.ksart.potatohandbook.model.data.PotatoVariety
+import ru.ksart.potatohandbook.model.data.Productivity
 import ru.ksart.potatohandbook.model.db.Potato
 import ru.ksart.potatohandbook.model.db.PotatoDao
+import ru.ksart.potatohandbook.model.db.PotatoDatabaseInitial
 import ru.ksart.potatohandbook.model.network.Api
+import ru.ksart.potatohandbook.ui.potato.filter.FilterFragment
 import ru.ksart.potatohandbook.utils.DebugHelper
 import java.io.File
 import javax.inject.Inject
@@ -20,6 +26,8 @@ class PotatoRepositoryImpl @Inject constructor(
     private val dao: PotatoDao,
     private val api: Api,
 ) : PotatoRepository {
+
+    private val defaultPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun getPotatoAll(): Flow<List<Potato>> {
         return dao.getPotatoAll().onEach { list ->
@@ -40,6 +48,35 @@ class PotatoRepositoryImpl @Inject constructor(
         item.imageUri?.let { deleteFile(it) }
     }
 
+    override suspend fun deleteAll() {
+        dao.removePotatoAll()
+        deleteFolder(POTATO_IMAGE_FILES_PATH)
+    }
+
+    override suspend fun initData() {
+        withContext(Dispatchers.IO) {
+            val list = PotatoDatabaseInitial().potatoInitData
+            list.forEach { potato ->
+                val fileUri = potato.imageUrl?.let { downloadImage(potato.name, it) }
+                add(potato.copy(imageUri = fileUri))
+            }
+        }
+    }
+
+    override suspend fun readFilter(): Pair<Boolean, Triple<PotatoVariety?, PeriodRipening?, Productivity?>> {
+        return withContext(Dispatchers.IO) {
+            val name = defaultPreferences.getBoolean(FilterFragment.NAME, true)
+            val variety = defaultPreferences.getString(FilterFragment.VARIETY,"0")?.toIntOrNull() ?: 0
+            val ripening = defaultPreferences.getString(FilterFragment.RIPENING,"0")?.toIntOrNull() ?: 0
+            val productivity = defaultPreferences.getString(FilterFragment.PRODUCTIVITY,"0")?.toIntOrNull() ?: 0
+            name to Triple(
+                if (variety in 1..PotatoVariety.values().lastIndex) PotatoVariety.values()[variety] else null,
+                if (ripening in 1..PeriodRipening.values().lastIndex) PeriodRipening.values()[ripening] else null,
+                if (productivity in 1..Productivity.values().lastIndex) Productivity.values()[productivity] else null
+            )
+        }
+    }
+
     override suspend fun downloadImage(name: String, url: String): String {
         return saveImage(name, url)
     }
@@ -55,7 +92,7 @@ class PotatoRepositoryImpl @Inject constructor(
                 context.getExternalFilesDir(POTATO_IMAGE_FILES_PATH)
             } else {
                 DebugHelper.log("PotatoRepositoryImpl|saveImage InternalStorage")
-                File(context.filesDir.path+"/$POTATO_IMAGE_FILES_PATH")
+                File(context.filesDir.path.plus(POTATO_IMAGE_FILES_PATH))
             }
             val ext = File(url).extension
             file = File(folder, "$name.$ext")
@@ -83,12 +120,28 @@ class PotatoRepositoryImpl @Inject constructor(
 
     private suspend fun deleteFile(fileName: String) {
         withContext(Dispatchers.IO) {
-            DebugHelper.log("PotatoRepositoryImpl|deleteMediaUri file=$fileName")
+            DebugHelper.log("PotatoRepositoryImpl|deleteFile file=$fileName")
             try {
                 val file = File(fileName)
                 if (file.exists()) file.delete()
             } catch (e: Exception) {
-                DebugHelper.log("PotatoRepositoryImpl|deleteMediaUri error")
+                DebugHelper.log("PotatoRepositoryImpl|deleteFile error")
+            }
+        }
+    }
+
+    private suspend fun deleteFolder(folderName: String) {
+        withContext(Dispatchers.IO) {
+            DebugHelper.log("PotatoRepositoryImpl|deleteFolder file=$folderName")
+            try {
+                var folder = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+                    context.getExternalFilesDir(folderName)
+                } else null
+                folder?.takeIf { it.exists() }?.delete()
+                folder = File(context.filesDir.path.plus(folderName))
+                if (folder.exists()) folder.delete()
+            } catch (e: Exception) {
+                DebugHelper.log("PotatoRepositoryImpl|deleteFolder error")
             }
         }
     }
