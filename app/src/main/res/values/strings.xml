@@ -49,7 +49,18 @@
     <string name="basic_sort_title">Basic sorting</string>
     <string name="preferences_sort_title">Preferences sorting</string>
 
+    <string name="name_sort_on_hint">Sort alphabetically</string>
+    <string name="name_sort_off_hint">Sort alphabetically descending</string>
+
     <string name="variety_preference_title">Variety</string>
     <string name="variety_preference_summary">Potato variety and quality</string>
+
+    <string name="dbms_switch_title">DbMS: Room - Cursor</string>
+    <string name="dbms_title">DbMS</string>
+    <string name="cursor_dbms_hint">Cursor</string>
+    <string name="room_dbms_hint">Room</string>
+<!--СУБД subTitle-->
+    <string name="room_dbms_title">Room</string>
+    <string name="cursor_dbms_title">Cursor</string>
 
 </resources>

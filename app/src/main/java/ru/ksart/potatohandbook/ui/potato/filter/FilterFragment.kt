@@ -14,11 +14,4 @@ class FilterFragment : PreferenceFragmentCompat() {
         parent?.showMenu(show = false)
         addPreferencesFromResource(R.xml.fragment_filter)
     }
-
-    companion object {
-        const val NAME = "name_switch"
-        const val VARIETY = "variety"
-        const val RIPENING = "ripening"
-        const val PRODUCTIVITY = "productivity"
-    }
 }

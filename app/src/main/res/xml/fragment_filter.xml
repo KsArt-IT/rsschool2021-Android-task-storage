@@ -8,14 +8,11 @@
         android:title="@string/basic_sort_title">
 
         <SwitchPreferenceCompat
-            android:key="name_switch"
+            android:key="@string/name_switch_key"
             android:title="@string/name_title"
-            android:summary="@string/potato_name_hint"
-            android:defaultValue="true"/>
-<!--
-        android:summaryOn="@string/summary_on_toggle_summary_preference"
-        android:summaryOff="@string/summary_off_toggle_summary_preference"/>
--->
+            android:summaryOn="@string/name_sort_on_hint"
+            android:summaryOff="@string/name_sort_off_hint"
+            android:defaultValue="@bool/name_switch_value"/>
 
     </PreferenceCategory>
 
@@ -25,26 +22,37 @@
         app:initialExpandedChildrenCount="0">
 
         <DropDownPreference
-            android:key="variety"
+            android:key="@string/variety_key"
             android:title="@string/potato_variety_hint"
             android:entries="@array/variety"
             app:useSimpleSummaryProvider="true"
             android:entryValues="@array/variety_values"
             android:defaultValue="0"/>
         <DropDownPreference
-            android:key="ripening"
+            android:key="@string/ripening_key"
             android:title="@string/potato_ripening_hint"
             android:entries="@array/ripening"
             app:useSimpleSummaryProvider="true"
             android:entryValues="@array/ripening_values"
             android:defaultValue="0"/>
         <DropDownPreference
-            android:key="productivity"
+            android:key="@string/productivity_key"
             android:title="@string/potato_productivity_hint"
             android:entries="@array/productivity"
             app:useSimpleSummaryProvider="true"
             android:entryValues="@array/productivity_values"
             android:defaultValue="0"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/dbms_switch_title">
+
+        <SwitchPreferenceCompat
+            android:key="@string/dbms_switch_key"
+            android:title="@string/dbms_title"
+            android:summaryOn="@string/cursor_dbms_hint"
+            android:summaryOff="@string/room_dbms_hint"
+            android:defaultValue="@bool/dbms_switch_value"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

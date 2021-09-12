@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="dbms_switch_value">true</bool>
+    <bool name="name_switch_value">true</bool>
+
+    <string name="first_start_key" translatable="false">first_start</string>
+    <string name="dbms_switch_key" translatable="false">dbms_switch</string>
+    <string name="name_switch_key" translatable="false">name_switch</string>
+    <string name="variety_key" translatable="false">variety</string>
+    <string name="ripening_key" translatable="false">ripening</string>
+    <string name="productivity_key" translatable="false">productivity</string>
+
+</resources>

@@ -65,7 +65,7 @@ class PotatoAddViewModel @Inject constructor(
                 checkNameField(name)
                 checkDescriptionField(description)
                 if (_isDescriptionFieldError.value || _isNameFieldError.value) return@launch
-                val imageUri = if (imageUrl.isNotBlank()) repository.downloadImage(name, imageUrl) else null
+                val imageUri = repository.downloadImage(name, imageUrl)
                 repository.add(
                     item = Potato(
                         id = 0,

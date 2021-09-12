@@ -1,14 +1,19 @@
 package ru.ksart.potatohandbook.ui.main
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.IntegerRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import ru.ksart.potatohandbook.R
 import ru.ksart.potatohandbook.databinding.ActivityMainBinding
 import ru.ksart.potatohandbook.ui.ShowMenu
@@ -25,11 +30,15 @@ class MainActivity : AppCompatActivity(), ShowMenu {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(
-            ActivityMainBinding.inflate(layoutInflater).also { binding = it }.root
-        )
+        setContentView(ActivityMainBinding.inflate(layoutInflater).also { binding = it }.root)
+        bindViewModel()
         initAppBar()
         initToolbarMenu()
+    }
+
+    private fun bindViewModel() {
+        // обновлять субтитл
+        lifecycleScope.launchWhenStarted { viewModel.subTitle.collect(::showToolbarSubTitle) }
     }
 
     private fun initAppBar() {
@@ -92,11 +101,16 @@ class MainActivity : AppCompatActivity(), ShowMenu {
         navController.navigate(R.id.action_potatoFragment_to_filterFragment)
     }
 
+    override fun showMenu(show: Boolean) {
+        showToolbarMenu(show)
+    }
+
     private fun showToolbarMenu(show: Boolean) {
         binding.toolbar.menu.setGroupVisible(0, show)
     }
 
-    override fun showMenu(show: Boolean) {
-        showToolbarMenu(show)
+    private fun showToolbarSubTitle(@StringRes subTitle: Int) {
+        binding.toolbar.setSubtitle(if (subTitle != -1) subTitle else R.string.na)
     }
+
 }

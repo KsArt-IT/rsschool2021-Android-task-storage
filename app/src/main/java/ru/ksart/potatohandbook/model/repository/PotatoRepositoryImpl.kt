@@ -7,33 +7,37 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
-import ru.ksart.potatohandbook.model.data.PeriodRipening
-import ru.ksart.potatohandbook.model.data.PotatoVariety
-import ru.ksart.potatohandbook.model.data.Productivity
-import ru.ksart.potatohandbook.model.db.Potato
-import ru.ksart.potatohandbook.model.db.PotatoDao
-import ru.ksart.potatohandbook.model.db.PotatoDatabaseInitial
+import ru.ksart.potatohandbook.R
+import ru.ksart.potatohandbook.model.data.*
+import ru.ksart.potatohandbook.model.db.*
 import ru.ksart.potatohandbook.model.network.Api
-import ru.ksart.potatohandbook.ui.potato.filter.FilterFragment
 import ru.ksart.potatohandbook.utils.DebugHelper
 import java.io.File
 import javax.inject.Inject
 
 class PotatoRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val dao: PotatoDao,
+    private val daos: PotatoDaos,
     private val api: Api,
 ) : PotatoRepository {
 
-    private val defaultPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val res = context.resources
+    private var daoSwitch: Boolean = context.resources.getBoolean(R.bool.dbms_switch_value)
+    private val dao: PotatoDao get() = daos.getDao(daoSwitch)
+    override val dbmsName: StateFlow<Int> get() = daos.dbmsName
 
-    override fun getPotatoAll(): Flow<List<Potato>> {
-        return dao.getPotatoAll().onEach { list ->
-            DebugHelper.log("PotatoRepositoryImpl|getPotato list=${list.size}")
-        }
-    }
+    private val defaultPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    // ключи для чтения параметров sharedPref
+    private val firstStartKey: String by lazy { res.getString(R.string.first_start_key) }
+    private val dbmsKey: String by lazy { res.getString(R.string.dbms_switch_key) }
+    private val nameKey: String by lazy { res.getString(R.string.name_switch_key) }
+    private val varietyKey: String by lazy { res.getString(R.string.variety_key) }
+    private val ripeningKey: String by lazy { res.getString(R.string.ripening_key) }
+    private val productivityKey: String by lazy { res.getString(R.string.productivity_key) }
+
+    override fun getPotatoAll(): Flow<List<Potato>> = dao.getPotatoAll()
 
     override suspend fun add(item: Potato) {
         dao.insertPotato(item)
@@ -55,6 +59,7 @@ class PotatoRepositoryImpl @Inject constructor(
 
     override suspend fun initData() {
         withContext(Dispatchers.IO) {
+            DebugHelper.log("PotatoRepositoryImpl|initData")
             val list = PotatoDatabaseInitial().potatoInitData
             list.forEach { potato ->
                 val fileUri = potato.imageUrl?.let { downloadImage(potato.name, it) }
@@ -63,37 +68,52 @@ class PotatoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun readFilter(): Pair<Boolean, Triple<PotatoVariety?, PeriodRipening?, Productivity?>> {
-        return withContext(Dispatchers.IO) {
-            val name = defaultPreferences.getBoolean(FilterFragment.NAME, true)
-            val variety = defaultPreferences.getString(FilterFragment.VARIETY,"0")?.toIntOrNull() ?: 0
-            val ripening = defaultPreferences.getString(FilterFragment.RIPENING,"0")?.toIntOrNull() ?: 0
-            val productivity = defaultPreferences.getString(FilterFragment.PRODUCTIVITY,"0")?.toIntOrNull() ?: 0
-            name to Triple(
+    override suspend fun readFilter(): PotatoState = withContext(Dispatchers.IO) {
+        val firstStart = defaultPreferences.getBoolean(firstStartKey, true)
+        // если первый запуск
+        if (firstStart) {
+            defaultPreferences.edit().putBoolean(firstStartKey, false).apply()
+            initData()
+        }
+        daoSwitch = defaultPreferences.getBoolean(dbmsKey, daoSwitch)
+        DebugHelper.log("PotatoRepositoryImpl|readFilter daoSwitch=$daoSwitch")
+        val name = defaultPreferences.getBoolean(nameKey, res.getBoolean(R.bool.name_switch_value))
+        val variety =
+            defaultPreferences.getString(varietyKey, "0")?.toIntOrNull() ?: 0
+        val ripening =
+            defaultPreferences.getString(ripeningKey, "0")?.toIntOrNull() ?: 0
+        val productivity =
+            defaultPreferences.getString(productivityKey, "0")?.toIntOrNull() ?: 0
+        PotatoState(
+            daoSwitch,
+            name,
+            PotatoFilter(
                 if (variety in 1..PotatoVariety.values().lastIndex) PotatoVariety.values()[variety] else null,
                 if (ripening in 1..PeriodRipening.values().lastIndex) PeriodRipening.values()[ripening] else null,
                 if (productivity in 1..Productivity.values().lastIndex) Productivity.values()[productivity] else null
             )
-        }
-    }
-
-    override suspend fun downloadImage(name: String, url: String): String {
-        return saveImage(name, url)
+        )
     }
 
     //----------------------
 
-    private suspend fun saveImage(name: String, url: String): String = withContext(Dispatchers.IO) {
-        if (url.isBlank()) return@withContext ""
+    override suspend fun downloadImage(name: String, url: String): String? {
+        return saveImage(name, url)
+    }
+
+    private suspend fun saveImage(name: String, url: String): String? = withContext(Dispatchers.IO) {
+        if (url.isBlank()) return@withContext null
         var file: File? = null
         try {
             val folder = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-                DebugHelper.log("PotatoRepositoryImpl|saveImage ExternalStorage")
-                context.getExternalFilesDir(POTATO_IMAGE_FILES_PATH)
+                context.getExternalFilesDir(POTATO_IMAGE_FILES_PATH).also {
+                    DebugHelper.log("PotatoRepositoryImpl|saveImage ExternalStorage folder=$it")
+                }
             } else {
-                DebugHelper.log("PotatoRepositoryImpl|saveImage InternalStorage")
-                File(context.filesDir.path.plus(POTATO_IMAGE_FILES_PATH))
-            }
+                File(context.filesDir.path.plus(POTATO_IMAGE_FILES_PATH)).also {
+                    DebugHelper.log("PotatoRepositoryImpl|saveImage InternalStorage folder=$it")
+                }
+            } ?: return@withContext null
             val ext = File(url).extension
             file = File(folder, "$name.$ext")
             DebugHelper.log("PotatoRepositoryImpl|saveImage file=$file")
@@ -101,13 +121,16 @@ class PotatoRepositoryImpl @Inject constructor(
             file.toUri().toString()
         } catch (e: Exception) {
             DebugHelper.log("PotatoRepositoryImpl|saveImage error: ${e.localizedMessage}")
-            file?.takeIf { it.exists() }?.delete()
-            ""
+            try {
+                file?.takeIf { it.exists() }?.delete()
+            } catch (e: Exception) {}
+            null
         }
     }
 
     private suspend fun downloadFile(url: String, file: File) {
         withContext(Dispatchers.IO) {
+            DebugHelper.log("PotatoRepositoryImpl|downloadFile file=$url")
             file.outputStream().use { fileOutputStream ->
                 api.getFile(url)
                     .byteStream()
@@ -134,9 +157,10 @@ class PotatoRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             DebugHelper.log("PotatoRepositoryImpl|deleteFolder file=$folderName")
             try {
-                var folder = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-                    context.getExternalFilesDir(folderName)
-                } else null
+                var folder =
+                    if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+                        context.getExternalFilesDir(folderName)
+                    } else null
                 folder?.takeIf { it.exists() }?.delete()
                 folder = File(context.filesDir.path.plus(folderName))
                 if (folder.exists()) folder.delete()
