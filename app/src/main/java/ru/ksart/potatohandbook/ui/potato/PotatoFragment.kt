@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,10 +48,13 @@ class PotatoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         DebugHelper.log("PotatoFragment|onViewCreated ${this.hashCode()}")
         parent?.showMenu(show = true)
-        viewModel.readFilter()
         initAdapter()
         bindViewModel()
         initListener()
+        // для анимированного перехода
+        postponeEnterTransition()
+        (view.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
+//        views { potatoList.doOnPreDraw { startPostponedEnterTransition() } }
     }
 
     override fun onDestroyView() {
@@ -71,9 +77,6 @@ class PotatoFragment : Fragment() {
     private fun bindViewModel() {
         viewModel.run {
             lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
-//            lifecycleScope.launch { viewModel.potatoes.collect(::showList) }
-//            viewModel.potatoes.onEach { showList(it) }.launchIn(lifecycleScope)
-//            lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
         }
     }
 
@@ -83,9 +86,14 @@ class PotatoFragment : Fragment() {
         views { dbEmpty.isVisible = list.isEmpty() }
     }
 
-    private fun showDetail(item: Potato) {
+    private fun showDetail(item: Potato, imageView: ImageView) {
         DebugHelper.log("PotatoFragment|showDetail list=${item.name}")
-
+        val extras = FragmentNavigatorExtras(
+            // установим переход для анимации
+            imageView to item.id.toString()
+        )
+        val action = PotatoFragmentDirections.actionPotatoFragmentToPotatoDetailFragment(item)
+        findNavController().navigate(action, extras)
     }
 
     private fun initListener() {

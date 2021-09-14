@@ -14,14 +14,19 @@ class PotatoDaos(
     private var _dbmsName = MutableStateFlow<@StringRes Int>(-1)
     val dbmsName get() = _dbmsName.asStateFlow()
 
-    fun getDao(switch: Boolean): PotatoDao {
+    private var switch = false
+
+    fun setDao(switchDao: Boolean) {
+        switch = switchDao
+        _dbmsName.value = if (switch) R.string.cursor_dbms_title else R.string.room_dbms_title
+    }
+
+    fun getDao(): PotatoDao {
         return if (switch) {
             DebugHelper.log("PotatoDaos|getDao Cursor")
-            _dbmsName.value = R.string.cursor_dbms_title
             cursorDao.potatoDao()
         } else {
             DebugHelper.log("PotatoDaos|getDao Room")
-            _dbmsName.value = R.string.room_dbms_title
             roomDao.potatoDao()
         }
     }

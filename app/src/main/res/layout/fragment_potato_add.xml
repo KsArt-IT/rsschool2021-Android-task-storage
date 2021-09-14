@@ -47,7 +47,6 @@
                 android:nextFocusForward="@id/imageUrl" />
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/imageUrl"
             style="@style/Theme.PotatoHandbook.TextInputLayout.OutlinedBox"
@@ -61,25 +60,6 @@
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
                 android:inputType="textUri"
-                android:nextFocusForward="@id/addPotatoButton" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/productivity"
-            style="@style/Theme.PotatoHandbook.TextInputLayout.DropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/item_add_margin"
-            android:hint="@string/potato_productivity_hint"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/productivityWeight">
-
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:maxLines="1"
                 android:nextFocusForward="@id/variety" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,10 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/item_add_margin"
-            android:hint="@string/potato_variety_hint"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/productivity">
+            android:hint="@string/potato_variety_hint">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:layout_width="match_parent"
@@ -107,16 +84,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/item_add_margin"
-            android:hint="@string/potato_ripening_hint"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/variety">
+            android:hint="@string/potato_ripening_hint">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
-                android:nextFocusForward="@id/imageUri" />
+                android:nextFocusForward="@id/productivity" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/productivity"
+            style="@style/Theme.PotatoHandbook.TextInputLayout.DropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/item_add_margin"
+            android:hint="@string/potato_productivity_hint">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:maxLines="1"
+                android:nextFocusForward="@id/addPotatoButton" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
@@ -126,9 +116,7 @@
             android:layout_gravity="center"
             android:layout_margin="@dimen/button_margin"
             android:enabled="false"
-            android:text="@string/add_button_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageUri" />
+            android:text="@string/add_button_text" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

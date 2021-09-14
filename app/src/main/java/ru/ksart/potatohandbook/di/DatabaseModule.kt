@@ -7,11 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ru.ksart.potatohandbook.model.db.*
+import ru.ksart.potatohandbook.model.db.PotatoDaos
+import ru.ksart.potatohandbook.model.db.PotatoDatabase
+import ru.ksart.potatohandbook.model.db.PotatoDatabaseVersion
 import ru.ksart.potatohandbook.model.db.cursor.PotatoDatabaseCursorImpl
 import ru.ksart.potatohandbook.model.db.room.PotatoDatabaseRoomImpl
-import ru.ksart.potatohandbook.utils.DebugHelper
-import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
 

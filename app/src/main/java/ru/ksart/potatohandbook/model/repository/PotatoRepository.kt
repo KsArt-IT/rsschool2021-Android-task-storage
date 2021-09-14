@@ -10,6 +10,9 @@ import ru.ksart.potatohandbook.model.db.Potato
 
 interface PotatoRepository {
     val dbmsName: StateFlow<Int>
+    val changeFilter: StateFlow<Int>
+    suspend fun registerChangeFilter()
+    suspend fun unregisterChangeFilter()
 
     suspend fun initData()
 

@@ -1,9 +1,7 @@
 package ru.ksart.potatohandbook.ui.main
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -17,6 +15,7 @@ import kotlinx.coroutines.flow.collect
 import ru.ksart.potatohandbook.R
 import ru.ksart.potatohandbook.databinding.ActivityMainBinding
 import ru.ksart.potatohandbook.ui.ShowMenu
+import ru.ksart.potatohandbook.ui.extensions.toast
 import ru.ksart.potatohandbook.ui.potato.PotatoViewModel
 
 @AndroidEntryPoint
@@ -39,6 +38,8 @@ class MainActivity : AppCompatActivity(), ShowMenu {
     private fun bindViewModel() {
         // обновлять субтитл
         lifecycleScope.launchWhenStarted { viewModel.subTitle.collect(::showToolbarSubTitle) }
+        // показать тост
+        lifecycleScope.launchWhenStarted { viewModel.isToast.collect { if (it.isNotBlank()) toast(it) } }
     }
 
     private fun initAppBar() {

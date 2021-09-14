@@ -20,29 +20,69 @@ class PotatoViewModel @Inject constructor(
 
     private var updateListFromDbJob: Job? = null
     private var updateListFilteredJob: Job? = null
+    private var updateChangeFilterJob: Job? = null
 
     private val _potatoes = MutableStateFlow<List<Potato>>(emptyList())
     val potatoes: StateFlow<List<Potato>> get() = _potatoes.asStateFlow()
+
+    private val _isToast = MutableStateFlow("")
+    val isToast get() = _isToast.asStateFlow()
 
     val subTitle get() = repository.dbmsName
 
     private val listFlow = MutableStateFlow<List<Potato>>(emptyList())
     private val stateFlow = MutableStateFlow<PotatoState?>(null)
+    private val changeFilter = repository.changeFilter
+
     private val searchFlow = MutableStateFlow("")
+    private val searchLength = 1
 
     init {
         DebugHelper.log("PotatoViewModel|init ${this.hashCode()}")
-        readFilter(true)
-        updateListFromDb()
+        initFilterListener()
         updateListFiltered()
+    }
+
+    private fun initFilterListener() {
+        viewModelScope.launch {
+            repository.registerChangeFilter()
+        }
+
+        updateChangeFilterJob = changeFilter.onEach {
+            DebugHelper.log("PotatoViewModel|changeFilter n=$it")
+            stateFlow.value = repository.readFilter().also { stateNew ->
+                DebugHelper.log("PotatoViewModel|stateFlow ${stateFlow.value?.dbms}=${stateNew.dbms}")
+                stateFlow.value?.let { state ->
+                    if (state.dbms != stateNew.dbms) updateListFromDb()
+                } ?: updateListFromDb()
+            }
+        }
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
+    }
+
+    private fun unregisterChangeFilter() {
+        viewModelScope.launch {
+            repository.unregisterChangeFilter()
+        }
     }
 
     private fun updateListFromDb() {
         updateListFromDbJob?.takeIf { it.isActive }?.cancel()
-        updateListFromDbJob = repository.getPotatoAll().onEach {
-            DebugHelper.log("PotatoViewModel|updateListFromDb list=${it.size}")
-            listFlow.value = it
-        }.launchIn(viewModelScope)
+        DebugHelper.log("PotatoViewModel|updateListFromDb clear list")
+        _potatoes.value = emptyList()
+        listFlow.value = emptyList()
+        updateListFromDbJob = repository.getPotatoAll()
+            .flowOn(Dispatchers.IO)
+            .onEach {
+                DebugHelper.log("PotatoViewModel|updateListFromDb list=${it.size} на потоке ${Thread.currentThread().name}")
+                listFlow.value = it
+            }
+            .catch {
+                DebugHelper.log("PotatoViewModel|updateListFiltered error list")
+                listFlow.value = emptyList()
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun updateListFiltered() {
@@ -50,7 +90,9 @@ class PotatoViewModel @Inject constructor(
             listFlow.debounce(250),
             stateFlow.debounce(250),
             searchFlow.debounce(250)
-                .distinctUntilChanged(),
+                .distinctUntilChanged()
+                // не делать запрос короче 3 символов
+                .filter { it.isBlank() || it.length > searchLength },
             ::updateList
         )
             // выполнять не чаще ... мс
@@ -74,11 +116,10 @@ class PotatoViewModel @Inject constructor(
         state: PotatoState?,
         searchName: String
     ): List<Potato> {
-        DebugHelper.log("PotatoViewModel|updateList in")
         DebugHelper.log("PotatoViewModel|updateList in list=${listFromDb.size}")
         if (state == null && searchName == "") return listFromDb.sortedBy { it.name }
         val list = listFromDb.takeIf { it.isNotEmpty() }?.mapNotNull { potato ->
-            if ((searchName.length <= 2 ||
+            if ((searchName.isBlank() || searchName.length <= searchLength ||
                         potato.name.contains(searchName, ignoreCase = true)) &&
                 ((state == null) ||
                         (state.filter.variety == null && state.filter.ripening == null && state.filter.productivity == null) ||
@@ -97,43 +138,40 @@ class PotatoViewModel @Inject constructor(
         searchFlow.value = searchText
     }
 
-    // обновление фильтра
-    fun readFilter(init: Boolean = false) {
-        viewModelScope.launch {
-            DebugHelper.log("---------------------readFilter---------------------------")
-            val state = repository.readFilter()
-            stateFlow.value?.takeIf { (it.dbms != state.dbms) || init }
-                ?.let {
-                    DebugHelper.log("PotatoViewModel|readFilter clear list")
-                    _potatoes.value = emptyList()
-                    listFlow.value = emptyList()
-                    updateListFromDb()
-                }
-            stateFlow.value = state
-        }
-    }
-
     fun delete(item: Potato) {
         viewModelScope.launch {
-            repository.delete(item)
+            try {
+                repository.delete(item)
+            } catch (e: Throwable) {
+                _isToast.value = "Error deleting record id=${item.id}\n${e.localizedMessage}"
+            }
         }
     }
 
     fun deleteAll() {
         viewModelScope.launch {
-            repository.deleteAll()
+            try {
+                repository.deleteAll()
+            } catch (e: Throwable) {
+                _isToast.value = "Error deleting all records\n${e.localizedMessage}"
+            }
         }
     }
 
     fun initData() {
         viewModelScope.launch {
-            repository.initData()
+            try {
+                repository.initData()
+            } catch (e: Throwable) {
+                _isToast.value = "Error init data\n${e.localizedMessage}"
+            }
         }
     }
 
     override fun onCleared() {
         // отменим задание
         cancelJob()
+        unregisterChangeFilter()
         super.onCleared()
     }
 
@@ -141,5 +179,6 @@ class PotatoViewModel @Inject constructor(
         // отменим задание
         updateListFromDbJob?.takeIf { it.isActive }?.cancel()
         updateListFilteredJob?.takeIf { it.isActive }?.cancel()
+        updateChangeFilterJob?.takeIf { it.isActive }?.cancel()
     }
 }

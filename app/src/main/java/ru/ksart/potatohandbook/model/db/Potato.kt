@@ -1,6 +1,8 @@
 package ru.ksart.potatohandbook.model.db
 
+import android.os.Parcelable
 import androidx.room.*
+import kotlinx.android.parcel.Parcelize
 import ru.ksart.potatohandbook.model.data.PeriodRipening
 import ru.ksart.potatohandbook.model.data.PotatoVariety
 import ru.ksart.potatohandbook.model.data.Productivity
@@ -15,6 +17,7 @@ import ru.ksart.potatohandbook.model.data.Productivity
     ]
 )
 @TypeConverters(EnumConverter::class)
+@Parcelize
 data class Potato(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = PotatoContract.Columns.ID)
@@ -36,4 +39,4 @@ data class Potato(
     // -Урожайность, Высокая, средняя, низкая и в количественном: Центнеров на гектар с возможность пересчета на тонн на гектар и Кг на сотку
     @ColumnInfo(name = PotatoContract.Columns.PRODUCTIVITY)
     val productivity: Productivity = Productivity.Na,
-)
+): Parcelable

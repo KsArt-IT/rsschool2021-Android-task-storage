@@ -1,11 +1,14 @@
 package ru.ksart.potatohandbook.model.db.cursor
 
 import android.content.ContentValues
-import android.database.Cursor
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import ru.ksart.potatohandbook.model.db.EnumConverter
 import ru.ksart.potatohandbook.model.db.Potato
 import ru.ksart.potatohandbook.model.db.PotatoContract
@@ -16,33 +19,11 @@ class PotatoCursorDao(private val db: SQLiteDatabase) : PotatoDao {
 
     private val converter = EnumConverter()
     private val changeFlow = MutableStateFlow<Long>(-1)
-    private val _listFlow = MutableStateFlow<List<Potato>>(emptyList())
-    private val listFlow: StateFlow<List<Potato>> get() = _listFlow.asStateFlow()
 
-    private var updateListJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    init {
-        changeFlow
-//                .debounce(250)
-            .onEach {
-                DebugHelper.log("PotatoCursorDao|changeFlow change=$it")
-                updateList()
-            }
-            .flowOn(Dispatchers.IO)
-            .catch {
-                DebugHelper.log("PotatoCursorDao|updateList error update list")
-                _listFlow.value = emptyList()
-            }.launchIn(scope)
-        changeFlow.value++
-        DebugHelper.log("PotatoCursorDao|init ${changeFlow.value}")
-    }
-
-    private fun updateList() {
+    private fun updateList(): List<Potato> {
         DebugHelper.log("PotatoCursorDao|updateList in")
-        var cursor: Cursor? = null
         val list = mutableListOf<Potato>()
-        cursor = db.query(PotatoContract.TABLE_NAME, null, null, null, null, null, null)
+        val cursor = db.query(PotatoContract.TABLE_NAME, null, null, null, null, null, null)
         DebugHelper.log("PotatoCursorDao|updateList cursor=${cursor?.count}")
         cursor?.takeIf { it.count > 0 }?.use {
             val indexOfId = it.getColumnIndexOrThrow(PotatoContract.Columns.ID)
@@ -85,12 +66,14 @@ class PotatoCursorDao(private val db: SQLiteDatabase) : PotatoDao {
                 list.add(item)
             }
         }
-        DebugHelper.log("PotatoCursorDao|updateList list=${_listFlow.value}")
-        _listFlow.value = list.toList()
+        DebugHelper.log("PotatoCursorDao|updateList list=${list.size}")
+        return list.toList()
     }
 
-    override fun getPotatoAll(): Flow<List<Potato>> = listFlow.onEach {
-        DebugHelper.log("PotatoCursorDao|getPotatoAll list=${it.size}")
+    override fun getPotatoAll(): Flow<List<Potato>> = changeFlow.map {
+        updateList()
+    }.onEach {
+        DebugHelper.log("PotatoCursorDao|getPotatoAll list=${it.size} на потоке ${Thread.currentThread().name}")
     }
 
     override suspend fun insertPotato(potato: Potato): Long = withContext(Dispatchers.IO) {
@@ -119,7 +102,7 @@ class PotatoCursorDao(private val db: SQLiteDatabase) : PotatoDao {
             DebugHelper.log("PotatoCursorDao|insertPotato id=${rowId} name=${potato.name}")
             rowId
         } catch (e: SQLException) {
-            DebugHelper.log("PotatoCursorDao|insertPotato error insert name=${potato.name}")
+            DebugHelper.log("PotatoCursorDao|insertPotato error insert name=${potato.name}", e)
             -1
         } finally {
             db.endTransaction()
@@ -131,6 +114,7 @@ class PotatoCursorDao(private val db: SQLiteDatabase) : PotatoDao {
         withContext(Dispatchers.IO) {
             try {
                 val values = ContentValues().apply {
+                    put(PotatoContract.Columns.ID, potato.id)
                     put(PotatoContract.Columns.NAME, potato.name)
                     put(PotatoContract.Columns.DESCRIPTION, potato.description)
                     put(PotatoContract.Columns.IMAGE_URI, potato.imageUri)
@@ -156,12 +140,13 @@ class PotatoCursorDao(private val db: SQLiteDatabase) : PotatoDao {
                     arrayOf(potato.id.toString())
                 )
                 db.setTransactionSuccessful()
-                DebugHelper.log("PotatoCursorDao|insertPotato update count=$count")
+                DebugHelper.log("PotatoCursorDao|updatePotato update count=$count id=${potato.id}")
             } catch (e: SQLException) {
                 DebugHelper.log(
-                    "PotatoCursorDao|insertPotato error insert name=${potato.name}",
+                    "PotatoCursorDao|updatePotato error update id=${potato.id} name=${potato.name}",
                     e
                 )
+                throw e
             } finally {
                 db.endTransaction()
                 changeFlow.value++

@@ -2,11 +2,16 @@
     <string name="app_name">Potatoes</string>
 
     <string name="list_empty_text">The list is empty</string>
+
+    <string name="title_potato">Potatoes</string>
+    <string name="title_potato_detail">Detailed information</string>
+
     <string name="title_action_search">Search</string>
     <string name="title_action_filter">Filter</string>
     <string name="title_action_add_data">Add data</string>
     <string name="title_action_delete">Delete all</string>
     <string name="title_action_add_item">Adding potato variety</string>
+
     <string name="na">-</string>
     <!--    содержание крахмала-->
     <string name="starch_content_potatoes">Starch content</string>
@@ -32,6 +37,8 @@
     <!--    Добавление элемента -->
     <string name="add_button_text">Add</string>
     <string name="add_new_item_description">Add new item</string>
+    <string name="error_name_text">error</string>
+    <string name="error_description_text">error</string>
 
     <string name="potato_add_image_url_hint">Link to picture of potato to download</string>
     <string name="potato_image_uri_hint">Link to image of potato</string>
@@ -62,5 +69,9 @@
 <!--СУБД subTitle-->
     <string name="room_dbms_title">Room</string>
     <string name="cursor_dbms_title">Cursor</string>
+<!--Редактирование-->
+    <string name="edit_button_text">Edit</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="update_button_text">Update</string>
 
 </resources>

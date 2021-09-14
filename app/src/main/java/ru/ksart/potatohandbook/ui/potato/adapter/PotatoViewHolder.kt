@@ -2,6 +2,7 @@ package ru.ksart.potatohandbook.ui.potato.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -12,43 +13,39 @@ import java.io.File
 
 class PotatoViewHolder(
     private val binding: ItemPotatoBinding,
-    private val onClick: (Potato) -> Unit
+    private val onClick: (Potato, ImageView) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     var item: Potato? = null
         private set
 
     init {
-        binding.root.setOnClickListener {
-            item?.let(onClick)
-        }
+        binding.run { root.setOnClickListener { item?.let { onClick(it, image) } } }
     }
 
     fun onBind(item: Potato) {
         this.item = item
 
-        views {
+        binding.run {
             caption.text = item.name
             description.text = item.description
-            val imageShow = if (item.imageUri != null && File(item.imageUri).exists()) item.imageUri
-            else item.imageUrl
-            imageShow?.let {
-                image.load(imageShow) {
+            val imageShow = item.imageUri?.takeIf { it.isNotBlank() && File(it).exists() }
+                ?: item.imageUrl
+            image.apply { transitionName = item.id.toString() }
+                .load(imageShow ?: "-") {
                     crossfade(true)
                     placeholder(R.drawable.ic_download)
-                    error(R.drawable.ic_error)
+                    error(R.drawable.potato)
                     transformations(CircleCropTransformation())
+                    build()
                 }
-            } ?: image.load(R.drawable.potato)
         }
     }
-
-    private fun <T> views(block: ItemPotatoBinding.() -> T): T? = binding.block()
 
     companion object {
         fun create(
             parent: ViewGroup,
-            onClick: (Potato) -> Unit
+            onClick: (Potato, ImageView) -> Unit
         ) = ItemPotatoBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,

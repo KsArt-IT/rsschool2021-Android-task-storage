@@ -72,8 +72,6 @@ class PotatoDatabaseCursorImpl(context: Context) : SQLiteOpenHelper(
         private const val CREATE_INDEX_NAME_SQL =
             "CREATE UNIQUE INDEX IF NOT EXISTS index_${PotatoContract.TABLE_NAME}_${PotatoContract.Columns.NAME} ON " +
                     "${PotatoContract.TABLE_NAME} (${PotatoContract.Columns.NAME});"
-//        _db.execSQL("CREATE TABLE IF NOT EXISTS `potatoes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `image_uri` TEXT, `image_url` TEXT, `variety` TEXT NOT NULL, `ripening` TEXT NOT NULL, `productivity` TEXT NOT NULL)");
-//        _db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_potatoes_name` ON `potatoes` (`name`)");
 
         private const val DELETE_TABLE_SQL = "DROP TABLE IF EXISTS ${PotatoContract.TABLE_NAME}"
         private const val DELETE_INDEX_NAME_SQL = "DROP INDEX IF EXISTS " +

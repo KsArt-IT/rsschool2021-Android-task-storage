@@ -23,8 +23,8 @@ class PotatoAddViewModel @Inject constructor(
     private val _isToast = MutableStateFlow("")
     val isToast: StateFlow<String> get() = _isToast.asStateFlow()
 
-    private val _isItemAdded = MutableStateFlow(false)
-    val isItemAdded: StateFlow<Boolean> get() = _isItemAdded.asStateFlow()
+    private val _isItemAdded = MutableStateFlow(-1)
+    val isItemAdded get() = _isItemAdded.asStateFlow()
 
     private val _isAddButtonEnabled = MutableStateFlow(false)
     val isAddButtonEnabled: StateFlow<Boolean> get() = _isAddButtonEnabled.asStateFlow()
@@ -53,34 +53,39 @@ class PotatoAddViewModel @Inject constructor(
     }
 
     fun add(
+        id: Long = 0,
         name: String,
         description: String,
         imageUrl: String,
-        variety: String,
-        ripening: String,
-        productivity: String,
+        variety: Int,
+        ripening: Int,
+        productivity: Int,
     ) {
         viewModelScope.launch {
             try {
+                // сбросим
+                _isItemAdded.value = -1
                 checkNameField(name)
                 checkDescriptionField(description)
                 if (_isDescriptionFieldError.value || _isNameFieldError.value) return@launch
                 val imageUri = repository.downloadImage(name, imageUrl)
-                repository.add(
-                    item = Potato(
-                        id = 0,
-                        name = name,
-                        description = description,
-                        imageUri = imageUri,
-                        imageUrl = if (imageUrl.isNotBlank()) imageUrl else null,
-                        variety = PotatoVariety.values()[variety.toIntOrNull() ?: 0],
-                        ripening = PeriodRipening.values()[ripening.toIntOrNull() ?: 0],
-                        productivity = Productivity.values()[productivity.toIntOrNull() ?: 0],
-                    )
+                val item = Potato(
+                    id = id,
+                    name = name,
+                    description = description,
+                    imageUri = imageUri,
+                    imageUrl = if (imageUrl.isNotBlank()) imageUrl else null,
+                    variety = PotatoVariety.values()[variety],
+                    ripening = PeriodRipening.values()[ripening],
+                    productivity = Productivity.values()[productivity],
                 )
-                _isItemAdded.value = true
+                if (id == 0L) repository.add(item) else repository.updatePotato(item)
+                // установим ок
+                _isItemAdded.value = 1
             } catch (e: Exception) {
-                _isToast.value = "Проверьте введенные данные!\n${e.localizedMessage}"
+                _isToast.value = "Check the entered data!\n${e.localizedMessage}"
+                // установим ошибку
+                _isItemAdded.value = 0
             }
         }
     }

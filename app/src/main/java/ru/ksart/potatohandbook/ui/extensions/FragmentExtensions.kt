@@ -10,6 +10,10 @@ fun Activity.toast(@StringRes stringRes: Int) {
     Toast.makeText(this, stringRes, Toast.LENGTH_LONG).show()
 }
 
+fun Activity.toast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+}
+
 fun Fragment.toast(@StringRes stringRes: Int) {
     Toast.makeText(requireContext(), stringRes, Toast.LENGTH_LONG).show()
 }

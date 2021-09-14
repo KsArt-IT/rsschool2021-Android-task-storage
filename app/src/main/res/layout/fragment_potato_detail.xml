@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/item_padding">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="16:10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        tools:text="@string/potato_name_hint"
+        android:lines="1"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceCaption"
+        app:layout_constraintBottom_toBottomOf="@+id/editPotatoButton"
+        app:layout_constraintEnd_toStartOf="@+id/editPotatoButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editPotatoButton" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_margin"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        android:ellipsize="end"
+        tools:text="@string/potato_description_hint"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editPotatoButton" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:text="@string/potato_variety_hint"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/variety"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"/>
+
+    <TextView
+        android:id="@+id/variety"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_margin"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        tools:text="@string/potato_variety_hint"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/description" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:text="@string/potato_ripening_hint"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ripening"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"/>
+
+    <TextView
+        android:id="@+id/ripening"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_margin"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        tools:text="@string/potato_ripening_hint"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/variety" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:text="@string/potato_productivity_hint"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/productivity"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"/>
+
+    <TextView
+        android:id="@+id/productivity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_margin"
+        android:layout_marginBottom="@dimen/item_add_margin"
+        tools:text="@string/potato_productivity_hint"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/ripening" />
+
+    <Button
+        android:id="@+id/editPotatoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="true"
+        android:text="@string/edit_button_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.35" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

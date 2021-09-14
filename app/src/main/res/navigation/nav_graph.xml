@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/potatoFragment"
         android:name="ru.ksart.potatohandbook.ui.potato.PotatoFragment"
-        android:label="PotatoFragment"
+        android:label="@string/title_potato"
         tools:layout="@layout/fragment_potato">
         <action
             android:id="@+id/action_potatoFragment_to_potatoAddFragment"
@@ -16,14 +16,36 @@
         <action
             android:id="@+id/action_potatoFragment_to_filterFragment"
             app:destination="@id/filterFragment" />
+        <action
+            android:id="@+id/action_potatoFragment_to_potatoDetailFragment"
+            app:destination="@id/potatoDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/potatoAddFragment"
         android:name="ru.ksart.potatohandbook.ui.potato.add.PotatoAddFragment"
         android:label="@string/title_action_add_item"
-        tools:layout="@layout/fragment_potato_add"/>
+        tools:layout="@layout/fragment_potato_add">
+        <argument
+            android:name="item"
+            app:argType="ru.ksart.potatohandbook.model.db.Potato"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
     <fragment
         android:id="@+id/filterFragment"
         android:name="ru.ksart.potatohandbook.ui.potato.filter.FilterFragment"
         android:label="@string/title_action_filter" />
+    <fragment
+        android:id="@+id/potatoDetailFragment"
+        android:name="ru.ksart.potatohandbook.ui.potato.detail.PotatoDetailFragment"
+        android:label="@string/title_potato_detail"
+        tools:layout="@layout/fragment_potato_detail">
+        <argument
+            android:name="item"
+            app:argType="ru.ksart.potatohandbook.model.db.Potato" />
+        <action
+            android:id="@+id/action_potatoDetailFragment_to_potatoAddFragment"
+            app:destination="@id/potatoAddFragment"
+            app:popUpTo="@id/potatoFragment" />
+    </fragment>
 </navigation>

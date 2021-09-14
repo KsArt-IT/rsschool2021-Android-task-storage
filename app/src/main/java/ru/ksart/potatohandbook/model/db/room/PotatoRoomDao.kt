@@ -8,7 +8,7 @@ import ru.ksart.potatohandbook.model.db.PotatoDao
 
 @Dao
 abstract class PotatoRoomDao: PotatoDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override suspend fun insertPotato(potato: Potato): Long
 
     @Query("SELECT * FROM ${PotatoContract.TABLE_NAME} ORDER BY ${PotatoContract.Columns.NAME} ASC")
