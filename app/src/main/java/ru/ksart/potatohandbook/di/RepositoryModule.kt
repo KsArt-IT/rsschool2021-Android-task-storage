@@ -5,13 +5,15 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
 import ru.ksart.potatohandbook.model.repository.PotatoRepository
 import ru.ksart.potatohandbook.model.repository.PotatoRepositoryImpl
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun provideRouteRepository(impl: PotatoRepositoryImpl): PotatoRepository
 }

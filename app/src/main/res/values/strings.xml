@@ -12,7 +12,7 @@
     <string name="title_action_delete">Delete all</string>
     <string name="title_action_add_item">Adding potato variety</string>
 
-    <string name="na">-</string>
+    <string name="na" translatable="false">-</string>
     <!--    содержание крахмала-->
     <string name="starch_content_potatoes">Starch content</string>
     <!--    сорт картофеля-->
@@ -64,14 +64,16 @@
 
     <string name="dbms_switch_title">DbMS: Room - Cursor</string>
     <string name="dbms_title">DbMS</string>
-    <string name="cursor_dbms_hint">Cursor</string>
-    <string name="room_dbms_hint">Room</string>
+    <string name="cursor_dbms_hint" translatable="false">Cursor</string>
+    <string name="room_dbms_hint" translatable="false">Room</string>
 <!--СУБД subTitle-->
-    <string name="room_dbms_title">Room</string>
-    <string name="cursor_dbms_title">Cursor</string>
+    <string name="room_dbms_title" translatable="false">Room</string>
+    <string name="cursor_dbms_title" translatable="false">Cursor</string>
 <!--Редактирование-->
     <string name="edit_button_text">Edit</string>
     <string name="cancel_button_text">Cancel</string>
     <string name="update_button_text">Update</string>
+    <string name="complete_text">Complete!</string>
+    <string name="error_added_item">Error adding element!</string>
 
 </resources>

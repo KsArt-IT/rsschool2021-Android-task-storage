@@ -28,8 +28,12 @@ class MainActivity : AppCompatActivity(), ShowMenu {
     private val viewModel by viewModels<PotatoViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Thread.sleep(400)
+        setTheme(R.style.Theme_PotatoHandbook)
+
         super.onCreate(savedInstanceState)
         setContentView(ActivityMainBinding.inflate(layoutInflater).also { binding = it }.root)
+
         bindViewModel()
         initAppBar()
         initToolbarMenu()

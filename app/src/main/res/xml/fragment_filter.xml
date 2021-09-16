@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<!--name,variety,ripening,productivity,-->
-<!--    сортировать по названию сорта или по параметрам-->
-    <PreferenceCategory
-        android:title="@string/basic_sort_title">
+    <!--name,variety,ripening,productivity,-->
+    <!--    сортировать по названию сорта или по параметрам-->
+    <PreferenceCategory android:title="@string/basic_sort_title">
 
         <SwitchPreferenceCompat
+            android:defaultValue="@bool/name_switch_value"
             android:key="@string/name_switch_key"
-            android:title="@string/name_title"
-            android:summaryOn="@string/name_sort_on_hint"
             android:summaryOff="@string/name_sort_off_hint"
-            android:defaultValue="@bool/name_switch_value"/>
+            android:summaryOn="@string/name_sort_on_hint"
+            android:title="@string/name_title" />
 
     </PreferenceCategory>
 
@@ -22,37 +20,36 @@
         app:initialExpandedChildrenCount="0">
 
         <DropDownPreference
+            android:defaultValue="0"
+            android:entries="@array/variety"
+            android:entryValues="@array/variety_values"
             android:key="@string/variety_key"
             android:title="@string/potato_variety_hint"
-            android:entries="@array/variety"
-            app:useSimpleSummaryProvider="true"
-            android:entryValues="@array/variety_values"
-            android:defaultValue="0"/>
+            app:useSimpleSummaryProvider="true" />
         <DropDownPreference
+            android:defaultValue="0"
+            android:entries="@array/ripening"
+            android:entryValues="@array/ripening_values"
             android:key="@string/ripening_key"
             android:title="@string/potato_ripening_hint"
-            android:entries="@array/ripening"
-            app:useSimpleSummaryProvider="true"
-            android:entryValues="@array/ripening_values"
-            android:defaultValue="0"/>
+            app:useSimpleSummaryProvider="true" />
         <DropDownPreference
+            android:defaultValue="0"
+            android:entries="@array/productivity"
+            android:entryValues="@array/productivity_values"
             android:key="@string/productivity_key"
             android:title="@string/potato_productivity_hint"
-            android:entries="@array/productivity"
-            app:useSimpleSummaryProvider="true"
-            android:entryValues="@array/productivity_values"
-            android:defaultValue="0"/>
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/dbms_switch_title">
+    <PreferenceCategory android:title="@string/dbms_switch_title">
 
         <SwitchPreferenceCompat
+            android:defaultValue="@bool/dbms_switch_value"
             android:key="@string/dbms_switch_key"
-            android:title="@string/dbms_title"
-            android:summaryOn="@string/cursor_dbms_hint"
             android:summaryOff="@string/room_dbms_hint"
-            android:defaultValue="@bool/dbms_switch_value"/>
+            android:summaryOn="@string/cursor_dbms_hint"
+            android:title="@string/dbms_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>

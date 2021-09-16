@@ -32,10 +32,9 @@ class PotatoViewModel @Inject constructor(
 
     private val listFlow = MutableStateFlow<List<Potato>>(emptyList())
     private val stateFlow = MutableStateFlow<PotatoState?>(null)
-    private val changeFilter = repository.changeFilter
+    val changeFilter = repository.changeFilter
 
     private val searchFlow = MutableStateFlow("")
-    private val searchLength = 1
 
     init {
         DebugHelper.log("PotatoViewModel|init ${this.hashCode()}")
@@ -48,6 +47,8 @@ class PotatoViewModel @Inject constructor(
             repository.registerChangeFilter()
         }
 
+/*
+// обновление сразу, при изменении переключателя
         updateChangeFilterJob = changeFilter.onEach {
             DebugHelper.log("PotatoViewModel|changeFilter n=$it")
             stateFlow.value = repository.readFilter().also { stateNew ->
@@ -59,6 +60,7 @@ class PotatoViewModel @Inject constructor(
         }
             .flowOn(Dispatchers.IO)
             .launchIn(viewModelScope)
+*/
     }
 
     private fun unregisterChangeFilter() {
@@ -67,12 +69,24 @@ class PotatoViewModel @Inject constructor(
         }
     }
 
+    fun readFilter() {
+        viewModelScope.launch {
+            DebugHelper.log("PotatoViewModel|readFilter")
+            stateFlow.value = repository.readFilter().also { stateNew ->
+                DebugHelper.log("PotatoViewModel|stateFlow ${stateFlow.value?.dbms}=${stateNew.dbms}")
+                stateFlow.value?.let { state ->
+                    if (state.dbms != stateNew.dbms) updateListFromDb()
+                } ?: updateListFromDb()
+            }
+        }
+    }
+
     private fun updateListFromDb() {
         updateListFromDbJob?.takeIf { it.isActive }?.cancel()
         DebugHelper.log("PotatoViewModel|updateListFromDb clear list")
         _potatoes.value = emptyList()
         listFlow.value = emptyList()
-        updateListFromDbJob = repository.getPotatoAll()
+        updateListFromDbJob = repository.getAll()
             .flowOn(Dispatchers.IO)
             .onEach {
                 DebugHelper.log("PotatoViewModel|updateListFromDb list=${it.size} на потоке ${Thread.currentThread().name}")
@@ -90,13 +104,11 @@ class PotatoViewModel @Inject constructor(
             listFlow.debounce(250),
             stateFlow.debounce(250),
             searchFlow.debounce(250)
-                .distinctUntilChanged()
-                // не делать запрос короче 3 символов
-                .filter { it.isBlank() || it.length > searchLength },
+                .distinctUntilChanged(),
             ::updateList
         )
             // выполнять не чаще ... мс
-            .debounce(500)
+            .debounce(250)
             // не повторять одинаковые запросы, но разные дао дают одинаковый результат
 //            .distinctUntilChanged()
             .flowOn(Dispatchers.IO)
@@ -119,8 +131,7 @@ class PotatoViewModel @Inject constructor(
         DebugHelper.log("PotatoViewModel|updateList in list=${listFromDb.size}")
         if (state == null && searchName == "") return listFromDb.sortedBy { it.name }
         val list = listFromDb.takeIf { it.isNotEmpty() }?.mapNotNull { potato ->
-            if ((searchName.isBlank() || searchName.length <= searchLength ||
-                        potato.name.contains(searchName, ignoreCase = true)) &&
+            if ((searchName.isBlank() || potato.name.contains(searchName, ignoreCase = true)) &&
                 ((state == null) ||
                         (state.filter.variety == null && state.filter.ripening == null && state.filter.productivity == null) ||
                         (state.filter.variety?.takeIf { it == potato.variety } != null) ||

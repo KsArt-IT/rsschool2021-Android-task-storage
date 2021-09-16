@@ -28,6 +28,11 @@ class PotatoViewHolder(
 
         binding.run {
             caption.text = item.name
+            val variety = binding.root.context.resources.getString(item.variety.caption)
+            val ripening = binding.root.context.resources.getString(item.ripening.caption)
+            val productivity = binding.root.context.resources.getString(item.productivity.caption)
+            val list = listOf(variety, ripening, productivity)
+            sort.text = list.joinToString(separator = ",")
             description.text = item.description
             val imageShow = item.imageUri?.takeIf { it.isNotBlank() && File(it).exists() }
                 ?: item.imageUrl

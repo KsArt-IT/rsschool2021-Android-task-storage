@@ -3,9 +3,9 @@ package ru.ksart.potatohandbook.model.db
 import kotlinx.coroutines.flow.Flow
 
 interface PotatoDao {
-    fun getPotatoAll(): Flow<List<Potato>>
-    suspend fun insertPotato(potato: Potato): Long
-    suspend fun updatePotato(potato: Potato)
-    suspend fun removePotato(potato: Potato)
-    suspend fun removePotatoAll()
+    fun getAll(): Flow<List<Potato>>
+    suspend fun insert(potato: Potato): Long
+    suspend fun update(potato: Potato): Int
+    suspend fun remove(potato: Potato)
+    suspend fun removeAll()
 }

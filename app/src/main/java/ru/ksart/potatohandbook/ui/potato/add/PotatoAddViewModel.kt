@@ -35,7 +35,52 @@ class PotatoAddViewModel @Inject constructor(
     private val _isDescriptionFieldError = MutableStateFlow(false)
     val isDescriptionFieldError: StateFlow<Boolean> get() = _isDescriptionFieldError.asStateFlow()
 
+    private var potato: Potato = Potato(
+        id = 0,
+        name = "",
+        description = "",
+        imageUri = null,
+        imageUrl = null,
+        variety = PotatoVariety.Na,
+        ripening = PeriodRipening.Na,
+        productivity = Productivity.Na
+    )
 
+    fun getPotato() = potato
+
+    fun savePotato(potato: Potato) {
+        this.potato = potato
+    }
+
+    fun saveName(name: String) {
+        potato = potato.copy(name = name)
+        checkNameField(name)
+    }
+
+    fun saveDescription(description: String) {
+        potato = potato.copy(description = description)
+        checkDescriptionField(description)
+    }
+
+    fun saveImageUrl(imageUrl: String?) {
+        val url = imageUrl?.takeIf { it.isNotBlank() }
+        potato = potato.copy(imageUrl = url)
+    }
+
+    fun saveVariety(variety: Int) {
+        if (variety in PotatoVariety.values().indices)
+            potato = potato.copy(variety = PotatoVariety.values()[variety])
+    }
+
+    fun saveRipening(ripening: Int) {
+        if (ripening in PeriodRipening.values().indices)
+            potato = potato.copy(ripening = PeriodRipening.values()[ripening])
+    }
+
+    fun saveProductivity(productivity: Int) {
+        if (productivity in Productivity.values().indices)
+            potato = potato.copy(productivity = Productivity.values()[productivity])
+    }
 
     fun checkNameField(field: String) {
         _isNameFieldError.value = field.isBlank()
@@ -48,45 +93,38 @@ class PotatoAddViewModel @Inject constructor(
     }
 
     private fun checkConditions() {
-        _isAddButtonEnabled.value = _isDescriptionFieldError.value.not() && _isNameFieldError.value.not()
+        _isAddButtonEnabled.value =
+            _isDescriptionFieldError.value.not() && _isNameFieldError.value.not()
         DebugHelper.log("PotatoAddViewModel|checkConditions button=${_isAddButtonEnabled.value}")
     }
 
-    fun add(
-        id: Long = 0,
-        name: String,
-        description: String,
-        imageUrl: String,
-        variety: Int,
-        ripening: Int,
-        productivity: Int,
-    ) {
+    fun add() {
         viewModelScope.launch {
             try {
                 // сбросим
                 _isItemAdded.value = -1
-                checkNameField(name)
-                checkDescriptionField(description)
-                if (_isDescriptionFieldError.value || _isNameFieldError.value) return@launch
-                val imageUri = repository.downloadImage(name, imageUrl)
-                val item = Potato(
-                    id = id,
-                    name = name,
-                    description = description,
-                    imageUri = imageUri,
-                    imageUrl = if (imageUrl.isNotBlank()) imageUrl else null,
-                    variety = PotatoVariety.values()[variety],
-                    ripening = PeriodRipening.values()[ripening],
-                    productivity = Productivity.values()[productivity],
-                )
-                if (id == 0L) repository.add(item) else repository.updatePotato(item)
+                checkNameField(potato.name)
+                checkDescriptionField(potato.description)
+                if (_isDescriptionFieldError.value || _isNameFieldError.value) {
+                    _isItemAdded.value = 0
+                    return@launch
+                }
+                val imageUri = potato.imageUrl?.let { url ->
+                    repository.downloadImage(potato.name, url)
+                }
+                if (potato.imageUri != imageUri) potato = potato.copy(imageUri = imageUri)
+                DebugHelper.log("PotatoAddViewModel|add id=${potato.id}")
+                val result = if (potato.id == 0L) repository.add(potato)
+                    else repository.update(potato).toLong()
                 // установим ок
-                _isItemAdded.value = 1
+                _isItemAdded.value = if (result > 0L) 1 else 0
             } catch (e: Exception) {
                 _isToast.value = "Check the entered data!\n${e.localizedMessage}"
                 // установим ошибку
                 _isItemAdded.value = 0
             }
         }
+
     }
+
 }

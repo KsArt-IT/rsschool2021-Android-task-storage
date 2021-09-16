@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -75,9 +76,8 @@ class PotatoFragment : Fragment() {
     }
 
     private fun bindViewModel() {
-        viewModel.run {
-            lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
-        }
+        lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
+        lifecycleScope.launchWhenStarted { viewModel.changeFilter.debounce(250).collect { viewModel.readFilter() } }
     }
 
     private fun showList(list: List<Potato>) {

@@ -9,10 +9,10 @@ import ru.ksart.potatohandbook.model.db.PotatoDao
 @Dao
 abstract class PotatoRoomDao: PotatoDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract override suspend fun insertPotato(potato: Potato): Long
+    abstract override suspend fun insert(potato: Potato): Long
 
-    @Query("SELECT * FROM ${PotatoContract.TABLE_NAME} ORDER BY ${PotatoContract.Columns.NAME} ASC")
-    abstract override fun getPotatoAll(): Flow<List<Potato>>
+    @Query("SELECT * FROM ${PotatoContract.TABLE_NAME}")
+    abstract override fun getAll(): Flow<List<Potato>>
 
 //    @Query("SELECT * FROM ${PotatoContract.TABLE_NAME} WHERE ${PotatoContract.Columns.ID} = :id ORDER BY ${PotatoContract.Columns.NAME} ASC")
 //    fun getPotatoId(id: Long): Flow<Potato>
@@ -21,13 +21,13 @@ abstract class PotatoRoomDao: PotatoDao {
 //    fun getPotatoBySearch(find: String): Flow<Potato>
 
     @Update
-    abstract override suspend fun updatePotato(potato: Potato)
+    abstract override suspend fun update(potato: Potato): Int
 
     @Delete
-    abstract override suspend fun removePotato(potato: Potato)
+    abstract override suspend fun remove(potato: Potato)
 
     @Query("DELETE FROM ${PotatoContract.TABLE_NAME}")
-    abstract override suspend fun removePotatoAll()
+    abstract override suspend fun removeAll()
 
 //    @Query("DELETE FROM ${PotatoContract.TABLE_NAME} WHERE ${PotatoContract.Columns.ID} = :potatoId")
 //    suspend fun removePotatoById(potatoId: Long)

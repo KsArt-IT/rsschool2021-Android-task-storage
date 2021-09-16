@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="dbms_switch_value">true</bool>
+    <bool name="dbms_switch_value">false</bool>
     <bool name="name_switch_value">true</bool>
 
     <string name="first_start_key" translatable="false">first_start</string>

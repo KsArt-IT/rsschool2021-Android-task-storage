@@ -1,7 +1,9 @@
 package ru.ksart.potatohandbook.model.repository
 
 import android.content.Context
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Environment
+import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -15,8 +17,6 @@ import ru.ksart.potatohandbook.model.network.Api
 import ru.ksart.potatohandbook.utils.DebugHelper
 import java.io.File
 import javax.inject.Inject
-import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 
 
 class PotatoRepositoryImpl @Inject constructor(
@@ -28,11 +28,13 @@ class PotatoRepositoryImpl @Inject constructor(
     private val res = context.resources
 
     private val dao: PotatoDao get() = daos.getDao()
-    override val dbmsName: StateFlow<Int> get() = daos.dbmsName
+    override val dbmsName: Flow<Int> get() = daos.dbmsName
 
     private val _changeFilter = MutableStateFlow(-1)
     override val changeFilter get() = _changeFilter.asStateFlow()
 
+    // для PreferenceManager используем lazy,
+    // чтобы в последствии первый раз обратиться к переменной на потоке Dispatchers.IO
     private val defaultPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
     private val listener by lazy {
         OnSharedPreferenceChangeListener { prefs, key ->
@@ -48,6 +50,10 @@ class PotatoRepositoryImpl @Inject constructor(
     private val varietyKey: String by lazy { res.getString(R.string.variety_key) }
     private val ripeningKey: String by lazy { res.getString(R.string.ripening_key) }
     private val productivityKey: String by lazy { res.getString(R.string.productivity_key) }
+
+    init {
+        DebugHelper.log("PotatoRepositoryImpl|init ${this.hashCode()}")
+    }
 
     override suspend fun registerChangeFilter() {
         withContext(Dispatchers.IO) {
@@ -68,7 +74,7 @@ class PotatoRepositoryImpl @Inject constructor(
             val firstStart = defaultPreferences.getBoolean(firstStartKey, true)
             // если первый запуск
             if (firstStart) {
-                defaultPreferences.edit().putBoolean(firstStartKey, false).apply()
+                defaultPreferences.edit { putBoolean(firstStartKey, false) }
                 initData()
             }
         }
@@ -86,7 +92,8 @@ class PotatoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun readFilter(): PotatoState = withContext(Dispatchers.IO) {
-        val daoSwitch = defaultPreferences.getBoolean(dbmsKey, res.getBoolean(R.bool.dbms_switch_value))
+        val daoSwitch =
+            defaultPreferences.getBoolean(dbmsKey, res.getBoolean(R.bool.dbms_switch_value))
         DebugHelper.log("PotatoRepositoryImpl|readFilter daoSwitch=$daoSwitch")
         daos.setDao(daoSwitch)
         val name = defaultPreferences.getBoolean(nameKey, res.getBoolean(R.bool.name_switch_value))
@@ -109,24 +116,20 @@ class PotatoRepositoryImpl @Inject constructor(
 
     //----------------------
 
-    override fun getPotatoAll(): Flow<List<Potato>> = dao.getPotatoAll()
+    override fun getAll(): Flow<List<Potato>> = dao.getAll()
 
-    override suspend fun add(item: Potato) {
-        dao.insertPotato(item)
-    }
+    override suspend fun add(item: Potato): Long = dao.insert(item)
 
-    override suspend fun updatePotato(item: Potato) {
-        dao.updatePotato(item)
-    }
+    override suspend fun update(item: Potato): Int = dao.update(item)
 
     override suspend fun delete(item: Potato) {
-        dao.removePotato(item)
+        dao.remove(item)
         item.imageUri?.let { deleteFile(it) }
     }
 
     override suspend fun deleteAll() {
-        dao.removePotatoAll()
-        deleteFolder(POTATO_IMAGE_FILES_PATH)
+        dao.removeAll()
+        deleteFolder(Environment.DIRECTORY_PICTURES)
     }
 
     //----------------------
@@ -141,11 +144,11 @@ class PotatoRepositoryImpl @Inject constructor(
             try {
                 val folder =
                     if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-                        context.getExternalFilesDir(POTATO_IMAGE_FILES_PATH).also {
+                        context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).also {
                             DebugHelper.log("PotatoRepositoryImpl|saveImage ExternalStorage folder=$it")
                         }
                     } else {
-                        File(context.filesDir.path.plus(POTATO_IMAGE_FILES_PATH)).also {
+                        File(context.filesDir.path.plus(Environment.DIRECTORY_PICTURES)).also {
                             DebugHelper.log("PotatoRepositoryImpl|saveImage InternalStorage folder=$it")
                         }
                     } ?: return@withContext null
@@ -199,14 +202,10 @@ class PotatoRepositoryImpl @Inject constructor(
                     } else null
                 folder?.takeIf { it.exists() }?.delete()
                 folder = File(context.filesDir.path.plus(folderName))
-                if (folder.exists()) folder.delete()
+                folder.takeIf { it.exists() }?.delete()
             } catch (e: Exception) {
                 DebugHelper.log("PotatoRepositoryImpl|deleteFolder error")
             }
         }
-    }
-
-    companion object {
-        private const val POTATO_IMAGE_FILES_PATH = "potato_images"
     }
 }

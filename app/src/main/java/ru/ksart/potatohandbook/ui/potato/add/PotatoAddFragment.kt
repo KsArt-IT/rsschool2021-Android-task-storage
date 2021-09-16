@@ -18,6 +18,7 @@ import ru.ksart.potatohandbook.databinding.FragmentPotatoAddBinding
 import ru.ksart.potatohandbook.model.data.PeriodRipening
 import ru.ksart.potatohandbook.model.data.PotatoVariety
 import ru.ksart.potatohandbook.model.data.Productivity
+import ru.ksart.potatohandbook.model.db.Potato
 import ru.ksart.potatohandbook.ui.ShowMenu
 import ru.ksart.potatohandbook.ui.extensions.hideKeyboardFrom
 import ru.ksart.potatohandbook.ui.extensions.setAdapterFromList
@@ -35,14 +36,7 @@ class PotatoAddFragment : Fragment() {
     private val args: PotatoAddFragmentArgs by navArgs()
     private val item by lazy { args.item }
 
-    private var potatoVariety = 0
-    private var periodRipening = 0
-    private var potatoProductivity = 0
-/*
-    private var potatoVariety: PotatoVariety = PotatoVariety.Na
-    private var periodRipening: PeriodRipening = PeriodRipening.Na
-    private var potatoProductivity: Productivity = Productivity.Na
-*/
+    private var potato: Potato? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,20 +52,24 @@ class PotatoAddFragment : Fragment() {
         initAdapters()
         bindViewModel()
         // если это редактирование
-        item?.let { potato ->
-            views {
-                name.editText?.setText(potato.name)
-                description.editText?.setText(potato.description)
-                imageUrl.editText?.setText(potato.imageUrl)
-                potatoVariety = potato.variety.ordinal
-                (variety.editText as? MaterialAutoCompleteTextView)?.setItemByIndex(potatoVariety)
-                periodRipening = potato.ripening.ordinal
-                (ripening.editText as? MaterialAutoCompleteTextView)?.setItemByIndex(periodRipening)
-                potatoProductivity = potato.productivity.ordinal
-                (productivity.editText as? MaterialAutoCompleteTextView)?.setItemByIndex(
-                    potatoProductivity
-                )
-            }
+        savedInstanceState ?: item?.let { viewModel.savePotato(it) }
+        // прочитаем состояние
+        potato = viewModel.getPotato()
+        // начальные значения
+        views {
+            addPotatoButton.setText(if (potato?.id == 0L) R.string.add_button_text else R.string.edit_button_text)
+            name.editText?.setText(potato?.name ?: "")
+            description.editText?.setText(potato?.description ?: "")
+            imageUrl.editText?.setText(potato?.imageUrl ?: "")
+            (variety.editText as? MaterialAutoCompleteTextView)?.setItemByIndex(
+                potato?.variety?.ordinal ?: 0
+            )
+            (ripening.editText as? MaterialAutoCompleteTextView)?.setItemByIndex(
+                potato?.ripening?.ordinal ?: 0
+            )
+            (productivity.editText as? MaterialAutoCompleteTextView)?.setItemByIndex(
+                potato?.productivity?.ordinal ?: 0
+            )
         }
     }
 
@@ -111,7 +109,7 @@ class PotatoAddFragment : Fragment() {
             name.editText?.run {
                 doAfterTextChanged {
                     it?.toString()?.let { value ->
-                        viewModel.checkNameField(value)
+                        viewModel.saveName(value)
                     }
                 }
                 setOnFocusChangeListener { _, hasFocus ->
@@ -121,11 +119,17 @@ class PotatoAddFragment : Fragment() {
             description.editText?.run {
                 doAfterTextChanged {
                     it?.toString()?.let { value ->
-                        viewModel.checkDescriptionField(value)
+                        viewModel.saveDescription(value)
                     }
                 }
                 setOnFocusChangeListener { _, hasFocus ->
                     if (hasFocus.not()) viewModel.checkDescriptionField(text.toString())
+                }
+            }
+
+            imageUrl.editText?.doAfterTextChanged {
+                it?.toString()?.let { value ->
+                    viewModel.saveImageUrl(value)
                 }
             }
 
@@ -135,11 +139,17 @@ class PotatoAddFragment : Fragment() {
 
             // следим за изменением
             (variety.editText as? MaterialAutoCompleteTextView)
-                ?.setOnItemClickListener { _, _, position, _ -> potatoVariety = position }
+                ?.setOnItemClickListener { _, _, position, _ ->
+                    viewModel.saveVariety(position)
+                }
             (ripening.editText as? MaterialAutoCompleteTextView)
-                ?.setOnItemClickListener { _, _, position, _ -> periodRipening = position }
+                ?.setOnItemClickListener { _, _, position, _ ->
+                    viewModel.saveRipening(position)
+                }
             (productivity.editText as? MaterialAutoCompleteTextView)
-                ?.setOnItemClickListener { _, _, position, _ -> potatoProductivity = position }
+                ?.setOnItemClickListener { _, _, position, _ ->
+                    viewModel.saveProductivity(position)
+                }
         }
     }
 
@@ -174,15 +184,7 @@ class PotatoAddFragment : Fragment() {
         views {
             switchEnabledFields(false)
             // добавление или редактирование
-            viewModel.add(
-                id = item?.id ?: 0,
-                name = name.editText?.text.toString(),
-                description = description.editText?.text.toString(),
-                imageUrl = imageUrl.editText?.text.toString(),
-                variety = potatoVariety,
-                ripening = periodRipening,
-                productivity = potatoProductivity,
-            )
+            viewModel.add()
         }
     }
 
@@ -207,10 +209,10 @@ class PotatoAddFragment : Fragment() {
     private fun close(close: Boolean) {
         DebugHelper.log("PotatoAddFragment|close $close")
         if (close) {
-            toast("Added!")
+            toast(R.string.complete_text)
             findNavController().navigateUp()
         } else {
-            toast("Error adding element!")
+            toast(R.string.error_added_item)
             switchEnabledFields(true)
         }
     }

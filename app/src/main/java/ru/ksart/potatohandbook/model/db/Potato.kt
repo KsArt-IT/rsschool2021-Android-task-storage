@@ -36,7 +36,7 @@ data class Potato(
     // -Срок созревания: Ранний(40-50 дней), Среднеранний(55-65 дней), Среднеспелый(65-80 дней), Среднепоздний(80-100 дней), Поздний(Свыше 100 дней)
     @ColumnInfo(name = PotatoContract.Columns.RIPENING)
     val ripening: PeriodRipening = PeriodRipening.Na,
-    // -Урожайность, Высокая, средняя, низкая и в количественном: Центнеров на гектар с возможность пересчета на тонн на гектар и Кг на сотку
+    // -Урожайность, Высокая, Средняя, Низкая и в количественном: Центнеров на гектар с возможность пересчета на тонн на гектар и Кг на сотку
     @ColumnInfo(name = PotatoContract.Columns.PRODUCTIVITY)
     val productivity: Productivity = Productivity.Na,
 ): Parcelable

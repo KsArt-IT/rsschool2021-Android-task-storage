@@ -22,13 +22,19 @@ class PotatoDatabaseCursorImpl(context: Context) : SQLiteOpenHelper(
     init {
         try {
             db = writableDatabase
-            dao = PotatoCursorDao(db!!)
+            dao = db?.let { PotatoCursorDao(it) }
         } catch (e: SQLException) {
-
+            try {
+                db?.close()
+                db = writableDatabase
+                dao = db?.let { PotatoCursorDao(it) }
+            } catch (e: SQLException) {
+                DebugHelper.log("PotatoDatabaseCursorImpl|init error", e)
+            }
         }
     }
 
-    override fun potatoDao(): PotatoDao = dao!!
+    override fun potatoDao(): PotatoDao = requireNotNull(dao) { "Error! db not initialized" }
 
     override fun onCreate(db: SQLiteDatabase) {
         try {
