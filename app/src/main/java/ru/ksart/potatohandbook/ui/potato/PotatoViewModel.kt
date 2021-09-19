@@ -5,7 +5,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.ksart.potatohandbook.model.data.PotatoState
 import ru.ksart.potatohandbook.model.db.Potato
@@ -26,7 +35,7 @@ class PotatoViewModel @Inject constructor(
     val potatoes: StateFlow<List<Potato>> get() = _potatoes.asStateFlow()
 
     private val _isToast = MutableStateFlow("")
-    val isToast get() = _isToast.asStateFlow()
+    val isToast: StateFlow<String> get() = _isToast.asStateFlow()
 
     val subTitle get() = repository.dbmsName
 
@@ -132,11 +141,13 @@ class PotatoViewModel @Inject constructor(
         if (state == null && searchName == "") return listFromDb.sortedBy { it.name }
         val list = listFromDb.takeIf { it.isNotEmpty() }?.mapNotNull { potato ->
             if ((searchName.isBlank() || potato.name.contains(searchName, ignoreCase = true)) &&
-                ((state == null) ||
+                (
+                    (state == null) ||
                         (state.filter.variety == null && state.filter.ripening == null && state.filter.productivity == null) ||
                         (state.filter.variety?.takeIf { it == potato.variety } != null) ||
                         (state.filter.ripening?.takeIf { it == potato.ripening } != null) ||
-                        (state.filter.productivity?.takeIf { it == potato.productivity } != null))
+                        (state.filter.productivity?.takeIf { it == potato.productivity } != null)
+                    )
             ) potato
             else null
         }.orEmpty()

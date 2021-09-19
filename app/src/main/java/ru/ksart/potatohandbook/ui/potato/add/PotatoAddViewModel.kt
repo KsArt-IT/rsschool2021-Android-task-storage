@@ -115,7 +115,7 @@ class PotatoAddViewModel @Inject constructor(
                 if (potato.imageUri != imageUri) potato = potato.copy(imageUri = imageUri)
                 DebugHelper.log("PotatoAddViewModel|add id=${potato.id}")
                 val result = if (potato.id == 0L) repository.add(potato)
-                    else repository.update(potato).toLong()
+                else repository.update(potato).toLong()
                 // установим ок
                 _isItemAdded.value = if (result > 0L) 1 else 0
             } catch (e: Exception) {
@@ -124,7 +124,5 @@ class PotatoAddViewModel @Inject constructor(
                 _isItemAdded.value = 0
             }
         }
-
     }
-
 }

@@ -56,7 +56,8 @@ class PotatoDetailFragment : Fragment() {
                         onError = { request: ImageRequest, throwable: Throwable ->
                             startPostponedEnterTransition()
 //                            request.error
-                        })
+                        }
+                    )
                     crossfade(true)
                     placeholder(R.drawable.ic_download)
                     error(R.drawable.potato)

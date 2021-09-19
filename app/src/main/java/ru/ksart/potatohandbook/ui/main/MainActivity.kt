@@ -117,5 +117,4 @@ class MainActivity : AppCompatActivity(), ShowMenu {
     private fun showToolbarSubTitle(@StringRes subTitle: Int) {
         binding.toolbar.setSubtitle(if (subTitle != -1) subTitle else R.string.na)
     }
-
 }

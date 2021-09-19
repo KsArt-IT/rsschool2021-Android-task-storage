@@ -16,5 +16,4 @@ class PotatoAdapter(
     override fun onBindViewHolder(holder: PotatoViewHolder, position: Int) {
         holder.onBind(getItem(position))
     }
-
 }

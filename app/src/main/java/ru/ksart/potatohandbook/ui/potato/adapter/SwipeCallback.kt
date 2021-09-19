@@ -20,5 +20,4 @@ class SwipeCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean = false
-
 }

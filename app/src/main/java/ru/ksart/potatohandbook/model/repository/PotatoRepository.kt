@@ -1,7 +1,6 @@
 package ru.ksart.potatohandbook.model.repository
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import ru.ksart.potatohandbook.model.data.PotatoState
 import ru.ksart.potatohandbook.model.db.Potato
 

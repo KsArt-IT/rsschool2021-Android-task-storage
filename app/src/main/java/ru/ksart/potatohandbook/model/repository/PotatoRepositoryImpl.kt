@@ -8,16 +8,24 @@ import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import ru.ksart.potatohandbook.R
-import ru.ksart.potatohandbook.model.data.*
-import ru.ksart.potatohandbook.model.db.*
+import ru.ksart.potatohandbook.model.data.PeriodRipening
+import ru.ksart.potatohandbook.model.data.PotatoFilter
+import ru.ksart.potatohandbook.model.data.PotatoState
+import ru.ksart.potatohandbook.model.data.PotatoVariety
+import ru.ksart.potatohandbook.model.data.Productivity
+import ru.ksart.potatohandbook.model.db.Potato
+import ru.ksart.potatohandbook.model.db.PotatoDao
+import ru.ksart.potatohandbook.model.db.PotatoDaos
+import ru.ksart.potatohandbook.model.db.PotatoDatabaseInitial
 import ru.ksart.potatohandbook.model.network.Api
 import ru.ksart.potatohandbook.utils.DebugHelper
 import java.io.File
 import javax.inject.Inject
-
 
 class PotatoRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -114,7 +122,7 @@ class PotatoRepositoryImpl @Inject constructor(
         )
     }
 
-    //----------------------
+    // ----------------------
 
     override fun getAll(): Flow<List<Potato>> = dao.getAll()
 
@@ -132,7 +140,7 @@ class PotatoRepositoryImpl @Inject constructor(
         deleteFolder(Environment.DIRECTORY_PICTURES)
     }
 
-    //----------------------
+    // ----------------------
     override suspend fun downloadImage(name: String, url: String): String? {
         return saveImage(name, url)
     }

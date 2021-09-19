@@ -1,7 +1,11 @@
 package ru.ksart.potatohandbook.model.db
 
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import kotlinx.android.parcel.Parcelize
 import ru.ksart.potatohandbook.model.data.PeriodRipening
 import ru.ksart.potatohandbook.model.data.PotatoVariety
@@ -39,4 +43,4 @@ data class Potato(
     // -Урожайность, Высокая, Средняя, Низкая и в количественном: Центнеров на гектар с возможность пересчета на тонн на гектар и Кг на сотку
     @ColumnInfo(name = PotatoContract.Columns.PRODUCTIVITY)
     val productivity: Productivity = Productivity.Na,
-): Parcelable
+) : Parcelable

@@ -1,13 +1,18 @@
 package ru.ksart.potatohandbook.model.db.room
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import ru.ksart.potatohandbook.model.db.Potato
 import ru.ksart.potatohandbook.model.db.PotatoContract
 import ru.ksart.potatohandbook.model.db.PotatoDao
 
 @Dao
-abstract class PotatoRoomDao: PotatoDao {
+abstract class PotatoRoomDao : PotatoDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override suspend fun insert(potato: Potato): Long
 
