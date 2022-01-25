@@ -12,7 +12,7 @@ class PotatoDaos(
 ) {
 
     private var _dbmsName = MutableStateFlow<@StringRes Int>(-1)
-    val dbmsName get() = _dbmsName.asStateFlow()
+    val dbmsName = _dbmsName.asStateFlow()
 
     private var switch = false
 

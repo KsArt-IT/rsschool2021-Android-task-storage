@@ -32,11 +32,12 @@ class PotatoViewModel @Inject constructor(
     private var updateChangeFilterJob: Job? = null
 
     private val _potatoes = MutableStateFlow<List<Potato>>(emptyList())
-    val potatoes: StateFlow<List<Potato>> get() = _potatoes.asStateFlow()
+    val potatoes: StateFlow<List<Potato>> = _potatoes.asStateFlow()
 
     private val _isToast = MutableStateFlow("")
-    val isToast: StateFlow<String> get() = _isToast.asStateFlow()
+    val isToast: StateFlow<String> = _isToast.asStateFlow()
 
+    // тут нужен перезапрос
     val subTitle get() = repository.dbmsName
 
     private val listFlow = MutableStateFlow<List<Potato>>(emptyList())

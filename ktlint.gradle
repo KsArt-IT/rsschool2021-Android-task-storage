@@ -8,7 +8,7 @@ configurations {
 }
 
 dependencies {
-    ktlint ("com.pinterest:ktlint:0.42.1") {
+    ktlint ('com.pinterest:ktlint:0.43.2') {
         attributes {
             attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
         }
@@ -37,9 +37,4 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     classpath = configurations.ktlint
     main = "com.pinterest.ktlint.Main"
     args "-F", "src/**/*.kt"
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }

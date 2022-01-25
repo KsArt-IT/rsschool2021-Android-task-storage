@@ -36,10 +36,10 @@ class PotatoRepositoryImpl @Inject constructor(
     private val res = context.resources
 
     private val dao: PotatoDao get() = daos.getDao()
-    override val dbmsName: Flow<Int> get() = daos.dbmsName
+    override val dbmsName: Flow<Int> = daos.dbmsName
 
     private val _changeFilter = MutableStateFlow(-1)
-    override val changeFilter get() = _changeFilter.asStateFlow()
+    override val changeFilter = _changeFilter.asStateFlow()
 
     // для PreferenceManager используем lazy,
     // чтобы в последствии первый раз обратиться к переменной на потоке Dispatchers.IO

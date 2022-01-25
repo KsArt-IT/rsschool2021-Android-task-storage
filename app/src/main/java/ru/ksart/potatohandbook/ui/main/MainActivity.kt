@@ -112,6 +112,7 @@ class MainActivity : AppCompatActivity(), ShowMenu {
 
     private fun showToolbarMenu(show: Boolean) {
         binding.toolbar.menu.setGroupVisible(0, show)
+
     }
 
     private fun showToolbarSubTitle(@StringRes subTitle: Int) {

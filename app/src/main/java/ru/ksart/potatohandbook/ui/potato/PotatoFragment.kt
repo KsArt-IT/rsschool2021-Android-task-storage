@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 import ru.ksart.potatohandbook.R
 import ru.ksart.potatohandbook.databinding.FragmentPotatoBinding
 import ru.ksart.potatohandbook.model.db.Potato
@@ -72,8 +73,12 @@ class PotatoFragment : Fragment() {
     }
 
     private fun bindViewModel() {
-        lifecycleScope.launchWhenStarted { viewModel.potatoes.collect(::showList) }
-        lifecycleScope.launchWhenStarted { viewModel.changeFilter.debounce(250).collect { viewModel.readFilter() } }
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            launch { viewModel.potatoes.collect(::showList) }
+            launch {
+                viewModel.changeFilter.debounce(250).collect { viewModel.readFilter() }
+            }
+        }
     }
 
     private fun showList(list: List<Potato>) {
